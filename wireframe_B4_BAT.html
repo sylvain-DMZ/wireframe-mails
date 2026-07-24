@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.30.0/tabler-icons.min.css">
+<style>
+:root{
+  --surface-1:#F6F5F3; --surface-2:#FFFFFF;
+  --border:#DDDAD3; --border-strong:#C3BFB6;
+  --text-secondary:#5C5A54; --text-muted:#8C8880;
+  --radius:8px;
+}
+body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#2B2A26;margin:0;padding:24px;background:#EFEDE9;}
+button{font-family:inherit;background:var(--surface-2);border:0.5px solid var(--border-strong);
+  border-radius:var(--radius);padding:8px 14px;cursor:pointer;}
+textarea{font-family:inherit;border:0.5px solid var(--border-strong);border-radius:var(--radius);padding:8px;resize:vertical;}
+</style></head><body>
+
+<div style="background: var(--surface-1); border-radius: 12px; padding: 1.25rem; max-width:760px; margin:0 auto;">
+
+  <!-- Bandeau d'état -->
+  <div style="background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 12px;">
+    <div style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:8px;">
+      <div>
+        <p style="margin:0; font-size:18px; font-weight:500;">Commande SO26-2861</p>
+        <p style="margin:2px 0 0; font-size:13px; color:var(--text-secondary);">Réf. interne : Gilets équipe dépôt</p>
+      </div>
+      <span style="font-size:13px; color:var(--text-secondary);"><i class="ti ti-user" style="font-size:15px; vertical-align:-2px;"></i> Sylvain BARRAUD · 05 46 45 96 99</span>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:6px; margin-top:14px;">
+      <div style="text-align:center; padding:8px 4px;">
+        <i class="ti ti-check" style="font-size:16px; color:#0F6E56;"></i>
+        <p style="margin:2px 0 0; font-size:12px; color:var(--text-secondary);">Contrôle</p>
+      </div>
+      <div style="text-align:center; padding:8px 4px; border-radius:var(--radius); background:#E1F5EE;">
+        <i class="ti ti-eye" style="font-size:16px; color:#085041;"></i>
+        <p style="margin:2px 0 0; font-size:12px; font-weight:500; color:#085041;">BAT</p>
+      </div>
+      <div style="text-align:center; padding:8px 4px;">
+        <i class="ti ti-settings" style="font-size:16px; color:var(--text-muted);"></i>
+        <p style="margin:2px 0 0; font-size:12px; color:var(--text-muted);">Production</p>
+      </div>
+      <div style="text-align:center; padding:8px 4px;">
+        <i class="ti ti-truck" style="font-size:16px; color:var(--text-muted);"></i>
+        <p style="margin:2px 0 0; font-size:12px; color:var(--text-muted);">Livraison</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Carte BAT -->
+  <div style="background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 12px; padding: 1rem 1.25rem;">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
+      <div>
+        <p style="margin:0; font-size:15px; font-weight:500;">Votre BAT (bon à tirer)</p>
+        <p style="margin:2px 0 0; font-size:13px; color:var(--text-secondary);">Version 2 · publié le 17/07/2026</p>
+      </div>
+      <span style="font-size:12px; padding:4px 12px; border-radius:var(--radius); background:#E1F5EE; color:#085041;">À valider</span>
+    </div>
+
+    <!-- Vignette réelle (1ère page) + actions -->
+    <div style="display:flex; gap:12px; margin:14px 0; align-items:stretch;">
+      <div style="flex:0 0 130px; min-height:150px; border:0.5px solid var(--border); border-radius:var(--radius); overflow:hidden; background:#fff; display:flex; align-items:center; justify-content:center;">
+        <!-- Ici : image générée de la 1ère page du PDF -->
+        <div style="width:100%; height:150px; background:repeating-linear-gradient(45deg, #f0f0ee, #f0f0ee 10px, #e6e5e1 10px, #e6e5e1 20px); display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-size:11px; text-align:center; padding:8px;">
+          [Vignette réelle<br>1ère page du PDF]
+        </div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:8px; justify-content:center;">
+        <button id="btnview" style="font-size:13px;" onclick="var v=document.getElementById('viewer'); v.style.display=v.style.display==='none'?'block':'none'; this.textContent = v.style.display==='none' ? 'Visualiser' : 'Masquer la visionneuse';">
+          <i class="ti ti-eye" style="font-size:15px; vertical-align:-2px;"></i> Visualiser
+        </button>
+        <button style="font-size:13px;"><i class="ti ti-download" style="font-size:15px; vertical-align:-2px;"></i> Télécharger le PDF</button>
+      </div>
+    </div>
+
+    <!-- Visionneuse intégrée (iframe) — repliée par défaut, dépliée au clic sur Visualiser -->
+    <div id="viewer" style="display:none; margin-bottom:14px; border:0.5px solid var(--border); border-radius:var(--radius); overflow:hidden; background:#3a3a38;">
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 12px; background:#2b2a28;">
+        <span style="font-size:12px; color:#ddd;"><i class="ti ti-file-type-pdf" style="font-size:14px; vertical-align:-2px;"></i> BAT_SO26-2861_v2.pdf</span>
+        <span style="font-size:11px; color:#999;">Zoom et pages : contrôles du lecteur intégré</span>
+      </div>
+      <div style="height:420px; background:#555; display:flex; align-items:center; justify-content:center; color:#ccc; font-size:13px;">
+        [ iframe : rendu natif du PDF par le navigateur — zoom, défilement, multi-page pris en charge nativement ]
+      </div>
+    </div>
+
+    <div style="background:#FAEEDA; border-radius:var(--radius); padding:10px 14px; margin-bottom:12px;">
+      <p style="margin:0; font-size:13px; color:#633806; line-height:1.5;"><i class="ti ti-alert-triangle" style="font-size:15px; vertical-align:-2px;"></i> Vérifiez attentivement : textes et logos, position et taille du marquage, couleurs, détails spécifiques à votre projet.</p>
+    </div>
+
+    <div style="border-top:0.5px solid var(--border); padding-top:12px;">
+      <label style="display:flex; gap:10px; align-items:flex-start; font-size:13px; line-height:1.5; cursor:pointer;">
+        <input type="checkbox" id="engage" style="margin-top:2px;" onchange="document.getElementById('btnval').style.opacity=this.checked?'1':'0.5'">
+        <span>J'ai vérifié les textes, logos, positions, tailles et couleurs. Je comprends que la validation engage la mise en production et qu'aucune modification ne sera possible ensuite.</span>
+      </label>
+      <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;">
+        <button id="btnval" style="background:#0F6E56; color:#fff; border:none; opacity:0.5;" onclick="var c=document.getElementById('engage'); if(c.checked){this.textContent='BAT validé'; this.style.opacity='1';}"><i class="ti ti-check" style="font-size:15px; vertical-align:-2px;"></i> Valider mon BAT</button>
+        <button onclick="var z=document.getElementById('corr'); z.style.display=z.style.display==='none'?'block':'none';" style="color:#993C1D; border-color:#F0997B;"><i class="ti ti-edit" style="font-size:15px; vertical-align:-2px;"></i> Demander une correction</button>
+      </div>
+      <div id="corr" style="display:none; margin-top:14px; background:var(--surface-1); border-radius:var(--radius); padding:12px 14px;">
+        <p style="margin:0 0 8px; font-size:13px; font-weight:500;">Éléments à corriger</p>
+        <div style="display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:6px; font-size:13px;">
+          <label style="display:flex; gap:6px; align-items:center;"><input type="checkbox"> Texte</label>
+          <label style="display:flex; gap:6px; align-items:center;"><input type="checkbox"> Logo</label>
+          <label style="display:flex; gap:6px; align-items:center;"><input type="checkbox"> Position</label>
+          <label style="display:flex; gap:6px; align-items:center;"><input type="checkbox"> Taille</label>
+          <label style="display:flex; gap:6px; align-items:center;"><input type="checkbox"> Couleur</label>
+          <label style="display:flex; gap:6px; align-items:center;"><input type="checkbox"> Autre</label>
+        </div>
+        <textarea placeholder="Décrivez la correction attendue (obligatoire)" style="width:100%; margin-top:10px; min-height:64px; font-size:13px;"></textarea>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; flex-wrap:wrap; gap:8px;">
+          <span style="font-size:12px; color:var(--text-muted);">Le commentaire est requis pour envoyer la demande.</span>
+          <button style="font-size:13px;">Envoyer ma demande de correction</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body></html>
