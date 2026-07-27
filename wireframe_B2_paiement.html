@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.30.0/tabler-icons.min.css">
+<style>
+:root{
+  --surface-1:#F6F5F3; --surface-2:#FFFFFF;
+  --border:#DDDAD3; --border-strong:#C3BFB6;
+  --text-secondary:#5C5A54; --text-muted:#8C8880;
+  --radius:8px;
+}
+*{box-sizing:border-box;}
+body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#2B2A26;margin:0;padding:24px;background:#EFEDE9;}
+button{font-family:inherit;cursor:pointer;}
+.demo-bar{max-width:980px;margin:0 auto 14px;background:#2B2A26;color:#fff;border-radius:8px;padding:10px 16px;font-size:12px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;}
+.demo-bar b{color:#F0C93B;}
+.demo-btn{background:#403F3A;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:12px;}
+.demo-btn.active{background:#0F6E56;}
+.layout{max-width:980px;margin:0 auto;display:grid;grid-template-columns:280px 1fr;gap:20px;}
+.sidebar{background:var(--surface-2);border:0.5px solid var(--border);border-radius:12px;padding:1.25rem;height:fit-content;}
+.main{display:flex;flex-direction:column;gap:14px;}
+.card{background:var(--surface-2);border:0.5px solid var(--border);border-radius:12px;padding:1.25rem;}
+.btn-outline{width:100%;background:var(--surface-2);border:0.5px solid var(--border-strong);border-radius:var(--radius);padding:10px;font-size:13px;margin-top:8px;}
+.btn-fill{width:100%;background:#0F6E56;color:#fff;border:none;border-radius:var(--radius);padding:12px;font-size:14px;font-weight:600;}
+.segmented{display:flex;background:var(--surface-1);border-radius:var(--radius);padding:3px;margin-bottom:12px;}
+.segmented button{flex:1;border:none;background:transparent;border-radius:6px;padding:8px;font-size:13px;color:var(--text-secondary);}
+.segmented button.active{background:#fff;color:#085041;font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,0.08);}
+</style></head><body>
+
+<div class="demo-bar">
+  <span><b>Wireframe — démonstration</b> (contrôles ci-dessous non présents dans le portail réel)</span>
+  <button class="demo-btn active" id="btnCase1" onclick="setCase(1)">Cas 1 · Paiement à la commande</button>
+  <button class="demo-btn" id="btnCase2" onclick="setCase(2)">Cas 2 · Chorus</button>
+</div>
+
+<div class="layout">
+
+  <!-- COLONNE GAUCHE — reprend la structure de l'écran devis -->
+  <div class="sidebar">
+
+    <p style="margin:0; font-size:28px; font-weight:700;">1 208,46 €</p>
+    <p style="margin:0 0 18px; font-size:13px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">TTC</p>
+
+    <!-- CAS 1 : bascule CB / Virement -->
+    <div id="zoneCase1">
+      <div class="segmented">
+        <button class="active" id="segCB" onclick="setMode('cb')"><i class="ti ti-credit-card" style="font-size:14px; vertical-align:-2px;"></i> Carte bancaire</button>
+        <button id="segVir" onclick="setMode('virement')"><i class="ti ti-building-bank" style="font-size:14px; vertical-align:-2px;"></i> Virement</button>
+      </div>
+
+      <div id="modeCB">
+        <button class="btn-fill"><i class="ti ti-lock" style="font-size:15px; vertical-align:-2px;"></i> Payer ma commande</button>
+      </div>
+
+      <div id="modeVirement" style="display:none;">
+        <div style="background:var(--surface-1); border-radius:var(--radius); padding:12px; font-size:12px; line-height:1.7;">
+          <p style="margin:0; font-weight:600;">Coordonnées bancaires</p>
+          <p style="margin:2px 0 0; color:var(--text-secondary);">CIC La Rochelle (CMCIFRPP)<br>FR76 3004 7142 8300 0220 7340 186<br>Titulaire : DYNAMIZ</p>
+          <p style="margin:8px 0 0; font-weight:600;">Référence à indiquer</p>
+          <p style="margin:2px 0 0; color:var(--text-secondary);">SO26-2861 <span style="color:var(--text-muted);">(= ${object.name})</span></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CAS 2 : Chorus -->
+    <div id="zoneCase2" style="display:none;">
+      <div id="chorusAvant">
+        <div style="border:0.5px dashed var(--border-strong); border-radius:var(--radius); padding:16px; text-align:center; color:var(--text-secondary);">
+          <i class="ti ti-upload" style="font-size:22px;"></i>
+          <p style="margin:8px 0 0; font-size:13px; font-weight:500;">Déposer votre bon de commande</p>
+        </div>
+        <button class="btn-fill" style="margin-top:10px;" onclick="chorusDeposer()"><i class="ti ti-file-upload" style="font-size:15px; vertical-align:-2px;"></i> Déposer le BDC</button>
+      </div>
+      <div id="chorusApres" style="display:none;">
+        <div style="background:#EAF3DE; border-radius:var(--radius); padding:12px; text-align:center;">
+          <i class="ti ti-check" style="font-size:16px; color:#27500A; vertical-align:-2px;"></i>
+          <span style="font-size:13px; color:#27500A;">BDC reçu le 24/07/2026</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Zone commune -->
+    <button class="btn-outline"><i class="ti ti-download" style="font-size:14px; vertical-align:-2px;"></i> Télécharger</button>
+    <button class="btn-outline"><i class="ti ti-printer" style="font-size:14px; vertical-align:-2px;"></i> Imprimer</button>
+    <button class="btn-outline"><i class="ti ti-message-circle" style="font-size:14px; vertical-align:-2px;"></i> Commentaires</button>
+
+    <div style="border-top:0.5px solid var(--border); margin-top:14px; padding-top:12px;">
+      <p style="margin:0; font-size:12px; color:var(--text-muted);"><i class="ti ti-eye-off" style="font-size:14px; vertical-align:-2px;"></i> <span id="maskedText">Masqués : Rejeter, coordonnées de virement, dépôt du bon de commande</span></p>
+    </div>
+
+    <div style="border-top:0.5px solid var(--border); margin-top:14px; padding-top:14px;">
+      <p style="margin:0 0 6px; font-size:13px; font-weight:600;">Vendeur</p>
+      <p style="margin:0; font-size:12px; color:var(--text-secondary);"><i class="ti ti-user" style="font-size:13px; vertical-align:-2px;"></i> Sylvain BARRAUD</p>
+      <p style="margin:2px 0 0; font-size:12px; color:var(--text-secondary);"><i class="ti ti-mail" style="font-size:13px; vertical-align:-2px;"></i> sylvain.barraud@dynamiz.fr</p>
+      <p style="margin:2px 0 0; font-size:12px; color:var(--text-secondary);"><i class="ti ti-phone" style="font-size:13px; vertical-align:-2px;"></i> 05 46 45 96 99</p>
+    </div>
+
+  </div>
+
+  <!-- CONTENU PRINCIPAL -->
+  <div class="main">
+
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:8px;">
+        <p style="margin:0; font-size:18px; font-weight:600;">Commande SO26-2861</p>
+        <span style="font-size:13px; color:var(--text-secondary);">08/07/2026</span>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:6px; margin-top:16px; opacity:0.5;">
+        <div style="text-align:center;"><i class="ti ti-checklist" style="font-size:16px; color:var(--text-muted);"></i><p style="margin:2px 0 0; font-size:11px; color:var(--text-muted);">Contrôle</p></div>
+        <div style="text-align:center;"><i class="ti ti-eye" style="font-size:16px; color:var(--text-muted);"></i><p style="margin:2px 0 0; font-size:11px; color:var(--text-muted);">BAT</p></div>
+        <div style="text-align:center;"><i class="ti ti-settings" style="font-size:16px; color:var(--text-muted);"></i><p style="margin:2px 0 0; font-size:11px; color:var(--text-muted);">Production</p></div>
+        <div style="text-align:center;"><i class="ti ti-truck" style="font-size:16px; color:var(--text-muted);"></i><p style="margin:2px 0 0; font-size:11px; color:var(--text-muted);">Livraison</p></div>
+      </div>
+
+      <div style="background:#FAEEDA; border-radius:var(--radius); padding:10px 14px; margin-top:14px;">
+        <p id="encartAttente" style="margin:0; font-size:13px; color:#633806;"><i class="ti ti-clock" style="font-size:15px; vertical-align:-2px;"></i> En attente de votre règlement — le traitement de votre commande démarrera à réception.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; font-size:13px; margin-bottom:16px;">
+        <div>
+          <p style="margin:0 0 4px; font-weight:600;">Adresse de facturation</p>
+          <p style="margin:0; color:var(--text-secondary); line-height:1.5;">Sylvain DMZ<br>xx rue<br>17450 St Laurent<br>France</p>
+        </div>
+        <div>
+          <p style="margin:0 0 4px; font-weight:600;">Adresse de livraison</p>
+          <p style="margin:0; color:var(--text-secondary); line-height:1.5;">Sylvain DMZ, Dépôt Test1<br>yyyy<br>17xxx Yves<br>France</p>
+        </div>
+      </div>
+      <div style="border-top:0.5px solid var(--border); padding-top:12px; font-size:13px;">
+        <p style="margin:0; color:var(--text-secondary);">[DYN-00013552] Gilet polycoton multipoches unisexe — WK. Designed To Work · 95 pièces</p>
+        <p style="margin:6px 0 0; color:var(--text-secondary);">Sérigraphie textile 1 couleur — Zone : Cœur</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function setCase(n){
+  document.getElementById('btnCase1').classList.toggle('active', n===1);
+  document.getElementById('btnCase2').classList.toggle('active', n===2);
+  document.getElementById('zoneCase1').style.display = n===1 ? 'block' : 'none';
+  document.getElementById('zoneCase2').style.display = n===2 ? 'block' : 'none';
+  document.getElementById('encartAttente').innerHTML = n===1
+    ? '<i class="ti ti-clock" style="font-size:15px; vertical-align:-2px;"></i> En attente de votre règlement — le traitement de votre commande démarrera à réception.'
+    : '<i class="ti ti-clock" style="font-size:15px; vertical-align:-2px;"></i> En attente de votre bon de commande Chorus — le traitement de votre commande démarrera à réception.';
+  document.getElementById('maskedText').textContent = n===1
+    ? 'Masqués : Rejeter, dépôt du bon de commande'
+    : 'Masqués : Rejeter, bouton de paiement CB, coordonnées de virement';
+}
+function setMode(mode){
+  document.getElementById('segCB').classList.toggle('active', mode==='cb');
+  document.getElementById('segVir').classList.toggle('active', mode==='virement');
+  document.getElementById('modeCB').style.display = mode==='cb' ? 'block' : 'none';
+  document.getElementById('modeVirement').style.display = mode==='virement' ? 'block' : 'none';
+}
+function chorusDeposer(){
+  document.getElementById('chorusAvant').style.display='none';
+  document.getElementById('chorusApres').style.display='block';
+}
+</script>
+
+</body></html>
