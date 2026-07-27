@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.30.0/tabler-icons.min.css">
+<style>
+:root{
+  --surface-1:#F6F5F3; --surface-2:#FFFFFF;
+  --border:#DDDAD3; --border-strong:#C3BFB6;
+  --text-secondary:#5C5A54; --text-muted:#8C8880;
+  --radius:8px;
+}
+*{box-sizing:border-box;}
+body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#2B2A26;margin:0;padding:24px;background:#EFEDE9;}
+button{font-family:inherit;cursor:pointer;}
+.demo-bar{max-width:980px;margin:0 auto 14px;background:#2B2A26;color:#fff;border-radius:8px;padding:10px 16px;font-size:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.demo-bar b{color:#F0C93B;}
+.demo-btn{background:#403F3A;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:12px;}
+.demo-btn.active{background:#0F6E56;}
+.layout{max-width:980px;margin:0 auto;display:grid;grid-template-columns:280px 1fr;gap:20px;}
+.sidebar{background:var(--surface-2);border:0.5px solid var(--border);border-radius:12px;padding:1.25rem;height:fit-content;}
+.main{display:flex;flex-direction:column;gap:14px;}
+.card{background:var(--surface-2);border:0.5px solid var(--border);border-radius:12px;padding:1.25rem;}
+.btn-outline{width:100%;background:var(--surface-2);border:0.5px solid var(--border-strong);border-radius:var(--radius);padding:10px;font-size:13px;margin-top:8px;}
+.btn-fill{width:100%;background:#0F6E56;color:#fff;border:none;border-radius:var(--radius);padding:12px;font-size:14px;font-weight:600;}
+.btn-fill:disabled{background:var(--border-strong);cursor:not-allowed;}
+</style></head><body>
+
+<div class="demo-bar">
+  <span><b>Wireframe — démonstration</b> (bascule ci-dessous absente du portail réel) :</span>
+  <button class="demo-btn active" id="btnE1" onclick="setState(1)">État 1 · À déposer</button>
+  <button class="demo-btn" id="btnE2" onclick="setState(2)">État 2 · Vérification</button>
+  <button class="demo-btn" id="btnE3" onclick="setState(3)">État 3 · Rejet</button>
+</div>
+
+<div class="layout">
+
+  <!-- COLONNE GAUCHE -->
+  <div class="sidebar">
+
+    <p style="margin:0 0 4px; font-size:13px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Commande</p>
+    <p style="margin:0 0 18px; font-size:18px; font-weight:700;">SO26-2861</p>
+
+    <!-- État 1 : à déposer -->
+    <div id="side1">
+      <button class="btn-fill" onclick="chooseFile()"><i class="ti ti-upload" style="font-size:15px; vertical-align:-2px;"></i> Déposer mon logo</button>
+      <p style="margin:8px 0 0; font-size:11px; color:var(--text-muted); line-height:1.5;">De préférence vectorisé : PDF, SVG, AI, EPS.</p>
+    </div>
+
+    <!-- État 2 : en cours de vérification -->
+    <div id="side2" style="display:none;">
+      <button class="btn-fill" disabled><i class="ti ti-clock" style="font-size:15px; vertical-align:-2px;"></i> Dépôt en cours de contrôle</button>
+      <p style="margin:8px 0 0; font-size:11px; color:var(--text-muted); line-height:1.5;">Bouton désactivé pendant la vérification par notre service graphique.</p>
+    </div>
+
+    <!-- État 3 : nouveau fichier demandé -->
+    <div id="side3" style="display:none;">
+      <button class="btn-fill" onclick="chooseFile()"><i class="ti ti-upload" style="font-size:15px; vertical-align:-2px;"></i> Déposer un nouveau fichier</button>
+      <p style="margin:8px 0 0; font-size:11px; color:var(--text-muted); line-height:1.5;">De préférence vectorisé : PDF, SVG, AI, EPS.</p>
+    </div>
+
+    <button class="btn-outline"><i class="ti ti-download" style="font-size:14px; vertical-align:-2px;"></i> Télécharger</button>
+    <button class="btn-outline"><i class="ti ti-printer" style="font-size:14px; vertical-align:-2px;"></i> Imprimer</button>
+    <button class="btn-outline"><i class="ti ti-message-circle" style="font-size:14px; vertical-align:-2px;"></i> Commentaires</button>
+
+    <div style="border-top:0.5px solid var(--border); margin-top:14px; padding-top:12px;">
+      <p style="margin:0; font-size:12px; color:var(--text-muted);"><i class="ti ti-eye-off" style="font-size:14px; vertical-align:-2px;"></i> Masqués à cette étape : Valider et Payer, Rejeter</p>
+    </div>
+
+    <div style="border-top:0.5px solid var(--border); margin-top:14px; padding-top:14px;">
+      <p style="margin:0 0 6px; font-size:13px; font-weight:600;">Vendeur</p>
+      <p style="margin:0; font-size:12px; color:var(--text-secondary);"><i class="ti ti-user" style="font-size:13px; vertical-align:-2px;"></i> Sylvain BARRAUD</p>
+      <p style="margin:2px 0 0; font-size:12px; color:var(--text-secondary);"><i class="ti ti-phone" style="font-size:13px; vertical-align:-2px;"></i> 05 46 45 96 99</p>
+    </div>
+
+  </div>
+
+  <!-- CONTENU PRINCIPAL -->
+  <div class="main">
+
+    <!-- Bandeau d'état -->
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:8px;">
+        <p style="margin:0; font-size:18px; font-weight:600;">Commande SO26-2861</p>
+        <span style="font-size:13px; color:var(--text-secondary);">1 208,46 € TTC</span>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:6px; margin-top:16px;">
+        <div style="text-align:center;"><i class="ti ti-check" style="font-size:16px; color:#0F6E56;"></i><p style="margin:2px 0 0; font-size:11px; color:var(--text-secondary);">Contrôle</p></div>
+        <div style="text-align:center; background:#E1F5EE; border-radius:var(--radius); padding:4px 0;"><i class="ti ti-eye" style="font-size:16px; color:#085041;"></i><p style="margin:2px 0 0; font-size:11px; font-weight:500; color:#085041;">BAT</p></div>
+        <div style="text-align:center;"><i class="ti ti-settings" style="font-size:16px; color:var(--text-muted);"></i><p style="margin:2px 0 0; font-size:11px; color:var(--text-muted);">Production</p></div>
+        <div style="text-align:center;"><i class="ti ti-truck" style="font-size:16px; color:var(--text-muted);"></i><p style="margin:2px 0 0; font-size:11px; color:var(--text-muted);">Livraison</p></div>
+      </div>
+
+      <p style="margin:10px 0 0; font-size:12px; color:var(--text-muted);">Le logo est un prérequis de l'étape BAT — la zone ci-dessous est mise en avant tant que le fichier n'est pas validé.</p>
+    </div>
+
+    <!-- Zone logo : un seul état visible à la fois -->
+
+    <!-- État 1 -->
+    <div class="card" id="main1" style="border-color:#1D9E75; border-width:2px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+        <p style="margin:0; font-size:14px; font-weight:600;">Votre logo</p>
+        <span style="font-size:12px; padding:3px 10px; border-radius:var(--radius); background:#E1F5EE; color:#085041;">Action attendue</span>
+      </div>
+      <div style="border:0.5px dashed var(--border-strong); border-radius:var(--radius); padding:28px; text-align:center; margin-top:12px; color:var(--text-secondary);">
+        <i class="ti ti-upload" style="font-size:26px;"></i>
+        <p style="margin:8px 0 0; font-size:14px;">Déposer votre logo</p>
+        <p style="margin:2px 0 0; font-size:12px; color:var(--text-muted);">De préférence vectorisé : PDF, SVG, AI, EPS</p>
+      </div>
+    </div>
+
+    <!-- État 2 -->
+    <div class="card" id="main2" style="display:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+        <p style="margin:0; font-size:14px; font-weight:600;">Votre logo</p>
+        <span style="font-size:12px; padding:3px 10px; border-radius:var(--radius); background:#FAEEDA; color:#633806;"><i class="ti ti-clock" style="font-size:13px; vertical-align:-2px;"></i> Sous-état PAO</span>
+      </div>
+      <div style="background:var(--surface-1); border-radius:var(--radius); padding:16px; margin-top:12px;">
+        <p style="margin:0; font-size:13px; color:var(--text-secondary);"><i class="ti ti-file-check" style="font-size:16px; vertical-align:-2px; color:#0F6E56;"></i> Logo reçu le 27/07/2026 — en cours de vérification par notre service graphique (sous 2 jours ouvrés).</p>
+      </div>
+      <p style="margin:10px 0 0; font-size:12px; color:var(--text-muted);">Aucune relance n'est déclenchée pendant cette vérification.</p>
+    </div>
+
+    <!-- État 3 -->
+    <div class="card" id="main3" style="display:none; border-color:#F0997B;">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+        <p style="margin:0; font-size:14px; font-weight:600;">Votre logo</p>
+        <span style="font-size:12px; padding:3px 10px; border-radius:var(--radius); background:#FAECE7; color:#993C1D;">Retour en attente logo</span>
+      </div>
+      <div style="background:#FAECE7; border-radius:var(--radius); padding:14px; margin-top:12px;">
+        <p style="margin:0; font-size:13px; font-weight:600; color:#993C1D;">Motif du service graphique</p>
+        <p style="margin:4px 0 0; font-size:13px; color:#712B13;">Le fichier transmis est en basse résolution (72 dpi) : le rendu sérigraphié serait pixelisé au-delà de 5 cm. Merci de nous transmettre une version vectorisée (PDF, SVG, AI ou EPS) ou une image haute résolution (300 dpi minimum à la taille finale).</p>
+      </div>
+      <div style="border:0.5px dashed var(--border-strong); border-radius:var(--radius); padding:24px; text-align:center; margin-top:14px; color:var(--text-secondary);">
+        <i class="ti ti-upload" style="font-size:24px;"></i>
+        <p style="margin:8px 0 0; font-size:14px;">Déposer un nouveau fichier</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function setState(n){
+  [1,2,3].forEach(i=>{
+    document.getElementById('btnE'+i).classList.toggle('active', i===n);
+    document.getElementById('side'+i).style.display = i===n ? 'block' : 'none';
+    document.getElementById('main'+i).style.display = i===n ? 'block' : 'none';
+  });
+}
+function chooseFile(){ setState(2); }
+</script>
+
+</body></html>
