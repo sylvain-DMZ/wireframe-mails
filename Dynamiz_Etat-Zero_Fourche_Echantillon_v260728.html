@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dynamiz — État zéro, fourche & échantillon · v260728</title>
+<style>
+  :root{
+    --ink:#2f2f2f;--ink2:#6b6b6b;--mute:#a2a2a2;
+    --line:#d8d8d8;--line2:#e8e8e8;--fill:#efefef;--fill2:#f7f7f7;
+    --paper:#fff;--bg:#f0f0f0;--accent:#00918c;--accent-soft:#e6f2f1;
+    --note:#c14a2b;--note-bg:#fbeee9;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.45;}
+  .wrap{max-width:1500px;margin:0 auto;padding:28px 20px 90px;}
+  .doc-head{border-bottom:2px solid var(--ink);padding-bottom:14px;margin-bottom:10px;}
+  .doc-head h1{font-size:19px;margin:0 0 3px;}
+  .doc-head p{margin:0;color:var(--ink2);font-size:13px;}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;margin:14px 0 26px;font-size:12px;color:var(--ink2);}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .sw{width:22px;height:12px;border-radius:2px;display:inline-block;border:1px solid var(--line);}
+  .marker{display:inline-flex;align-items:center;justify-content:center;min-width:17px;height:17px;padding:0 4px;
+    border-radius:9px;background:var(--note);color:#fff;font-size:10.5px;font-weight:700;vertical-align:middle;}
+  .frame-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ink2);
+    margin:34px 0 12px;display:flex;align-items:center;gap:10px;}
+  .frame-label::after{content:"";flex:1;height:1px;background:var(--line);}
+  .sub{font-size:12.5px;color:var(--ink2);margin:-4px 0 14px;max-width:960px;}
+
+  .screen{background:var(--paper);border:1px solid var(--line);border-radius:8px;overflow:hidden;}
+  .vp{position:relative;background:var(--bg);}
+  .vp-w{position:absolute;top:6px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--mute);
+    background:#fff;border:1px solid var(--line);border-radius:10px;padding:1px 9px;z-index:5;}
+  .band{background:#3a3a3a;color:#eee;}
+  .band .inner{max-width:1180px;margin:0 auto;padding:11px 24px;display:flex;align-items:center;gap:16px;font-size:12px;}
+  .band .logo{font-weight:800;color:#fff;}.band .nav{display:flex;gap:14px;color:#cfcfcf;}.band .icons{margin-left:auto;color:#cfcfcf;}
+  .breath{position:relative;}
+  .breath::before,.breath::after{content:"";position:absolute;top:0;bottom:0;width:calc((100% - 1180px)/2);
+    background:repeating-linear-gradient(45deg,transparent,transparent 8px,rgba(193,74,43,.05) 8px,rgba(193,74,43,.05) 16px);z-index:0;}
+  .breath::before{left:0;}.breath::after{right:0;}
+  .container{max-width:1180px;margin:0 auto;padding:0 24px;position:relative;z-index:1;background:var(--paper);}
+
+  .top{display:grid;grid-template-columns:1fr 300px;gap:24px;padding:16px 0 20px;border-bottom:1px solid var(--line2);}
+  .gal{display:flex;gap:9px;}
+  .thumbs{display:flex;flex-direction:column;gap:7px;}
+  .thumb{width:40px;height:48px;background:var(--fill);border:1px solid var(--line);border-radius:4px;}
+  .ph{background:repeating-linear-gradient(45deg,var(--fill2),var(--fill2) 9px,var(--fill) 9px,var(--fill) 18px);
+    border:1px solid var(--line);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--mute);font-size:11px;position:relative;text-align:center;}
+  .hero{flex:1;min-height:230px;}
+  .ident{display:flex;flex-direction:column;gap:10px;}
+  .brand{font-size:11px;font-weight:700;letter-spacing:1px;color:var(--ink2);text-transform:uppercase;}
+  .vrow{display:flex;gap:5px;align-items:center;}
+  .vrow i{width:26px;height:32px;background:var(--fill);border:1px solid var(--line);border-radius:4px;}
+  .vrow i:first-child{border-color:var(--accent);border-width:2px;}
+  .more{min-width:30px;height:32px;border:1px dashed var(--ink2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--ink2);}
+  .anchor{border:1px solid var(--line);border-radius:8px;padding:11px 13px;background:var(--fill2);}
+  .anchor .big{font-size:20px;font-weight:800;}.anchor .big small{font-size:11px;font-weight:600;color:var(--ink2);}
+  .anchor .qmin{font-size:11px;font-weight:700;margin-top:4px;}
+
+  /* entrée échantillon près de la galerie */
+  .sample{border:1px solid var(--accent);border-radius:8px;background:var(--accent-soft);padding:10px 12px;display:flex;gap:10px;align-items:center;}
+  .sample .si{font-size:19px;}
+  .sample .st{font-size:11.5px;font-weight:800;}
+  .sample .sx{font-size:10.5px;color:var(--ink2);}
+  .sample .sbtn{margin-left:auto;border:1px solid var(--accent);background:#fff;color:var(--accent);border-radius:6px;padding:6px 11px;font-size:11px;font-weight:700;white-space:nowrap;}
+
+  .layout{display:grid;grid-template-columns:1fr 320px;gap:26px;padding:18px 0 26px;align-items:start;}
+  .main h2{font-size:16px;font-weight:800;margin:0 0 3px;}
+  .main .rf{font-size:11px;color:var(--mute);margin-bottom:12px;}
+  .step{border-top:1px solid var(--line2);padding:15px 0;}
+  .step-h{display:flex;align-items:center;gap:9px;margin-bottom:11px;}
+  .step-n{width:21px;height:21px;border-radius:50%;background:var(--ink);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .step.lock .step-n{background:var(--mute);}
+  .step-h h3{font-size:13.5px;font-weight:800;margin:0;}
+  .step.lock h3{color:var(--ink2);}
+  .hint{font-size:11px;color:var(--note);font-weight:700;margin-left:auto;}
+  .lockmsg{font-size:11.5px;color:var(--ink2);background:var(--fill2);border:1px dashed var(--line);border-radius:6px;padding:8px 11px;display:inline-block;}
+  .tcards{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;}
+  .tcard{border:1px solid var(--line);border-radius:7px;overflow:hidden;background:#fff;}
+  .tcard .ti{height:48px;background:repeating-linear-gradient(45deg,var(--fill2),var(--fill2) 7px,var(--fill) 7px,var(--fill) 14px);}
+  .tcard .tb{padding:6px 7px;}.tcard .tn{font-size:10px;font-weight:800;}.tcard .tv{font-size:12px;font-weight:800;margin-top:2px;color:var(--mute);}
+  .sizes{display:flex;gap:7px;flex-wrap:wrap;}
+  .size{text-align:center;}.size .lbl{font-size:10px;font-weight:700;margin-bottom:2px;}
+  .size input{width:42px;height:28px;border:1px solid var(--line);border-radius:4px;text-align:center;font-size:12px;background:#fff;color:var(--ink);}
+  .size input.f{border-color:var(--accent);font-weight:700;}
+  /* grille quantité par couleur */
+  .sizegrid{border:1px solid var(--line);border-radius:8px;overflow:hidden;}
+  .sg-row{display:flex;align-items:center;gap:10px;padding:9px 11px;border-bottom:1px solid var(--line2);}
+  .sg-row:last-child{border-bottom:none;}
+  .sg-row .cth{width:28px;height:34px;border:1px solid var(--line);border-radius:4px;flex-shrink:0;}
+  .sg-row .cnm{font-size:11px;font-weight:700;min-width:58px;}
+  .sg-row .sub{font-size:10px;color:var(--ink2);}
+  .sg-sizes{display:flex;gap:5px;flex-wrap:wrap;flex:1;}
+  .ssz{text-align:center;}
+  .ssz .l{font-size:9px;font-weight:700;color:var(--ink2);}
+  .ssz input{width:36px;height:26px;border:1px solid var(--line);border-radius:4px;text-align:center;font-size:11px;background:#fff;color:var(--ink);}
+  .ssz input.f{border-color:var(--accent);font-weight:700;color:var(--ink);}
+  .sg-ct{font-size:11px;font-weight:700;min-width:34px;text-align:right;color:var(--accent);}
+  .sg-tot{background:var(--fill2);padding:9px 11px;font-size:11.5px;display:flex;gap:14px;align-items:center;border:1px solid var(--line);border-top:none;border-radius:0 0 8px 8px;}
+  .sg-tot b{font-size:13px;}
+  /* constructeur de variante (modale échantillon) */
+  .swrow{display:flex;gap:6px;flex-wrap:wrap;margin:7px 0 12px;}
+  .swz{width:26px;height:26px;border-radius:50%;border:1px solid var(--line);cursor:pointer;}
+  .swz.on{outline:2px solid var(--accent);outline-offset:1px;}
+  .szbtn{border:1px solid var(--line);border-radius:5px;padding:5px 9px;font-size:11px;background:#fff;cursor:pointer;min-width:34px;text-align:center;}
+  .szbtn.on{border-color:var(--accent);border-width:2px;color:var(--accent);font-weight:700;}
+  .builder{border:1px dashed var(--accent);border-radius:8px;padding:12px;background:var(--accent-soft);margin-bottom:10px;}
+  .builder .bl{font-size:10.5px;font-weight:700;color:var(--ink2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;}
+  .colorpick{display:flex;gap:7px;margin-bottom:11px;}
+  .cchip{display:flex;align-items:center;gap:5px;border:2px solid var(--accent);border-radius:20px;padding:3px 10px 3px 4px;font-size:11px;color:var(--accent);font-weight:700;}
+  .cchip .sq{width:16px;height:16px;border-radius:50%;background:var(--fill);border:1px solid var(--line);}
+  .addc{border:1px dashed var(--ink2);border-radius:20px;padding:4px 11px;font-size:11px;color:var(--ink2);}
+
+  /* SIDEBAR */
+  .recap{position:sticky;top:14px;border:1px solid var(--line);border-radius:10px;background:#fff;box-shadow:0 3px 14px rgba(0,0,0,.07);overflow:hidden;}
+  .recap .rhead{background:var(--fill2);border-bottom:1px solid var(--line);padding:12px;display:flex;gap:11px;align-items:center;}
+  .recap .rthumb{width:58px;height:68px;border:1px solid var(--line);border-radius:6px;flex-shrink:0;background:repeating-linear-gradient(45deg,var(--fill2),var(--fill2) 7px,var(--fill) 7px,var(--fill) 14px);}
+  .recap .rname{font-size:12px;font-weight:800;line-height:1.25;}
+  .recap .rbrand{font-size:10px;color:var(--ink2);margin-top:2px;}
+  .recap .rcol{display:flex;gap:4px;margin-top:5px;}
+  .recap .rcol i{width:14px;height:14px;border-radius:50%;border:1px solid var(--line);background:var(--fill);}
+  .recap .rcol i.on{border-color:var(--accent);border-width:2px;}
+  .recap .rbody{padding:14px 12px;}
+  .recap .zt{font-size:12px;font-weight:800;margin-bottom:3px;}
+  .recap .zx{font-size:11px;color:var(--ink2);margin-bottom:12px;line-height:1.5;}
+  .recap .steps0{margin:0 0 4px;padding:0;list-style:none;}
+  .recap .steps0 li{display:flex;gap:8px;align-items:center;font-size:11px;color:var(--ink2);padding:5px 0;}
+  .recap .steps0 .n{width:17px;height:17px;border-radius:50%;background:var(--fill);border:1px solid var(--line);font-size:9px;font-weight:800;color:var(--ink2);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .recap .steps0 li.now{color:var(--ink);font-weight:700;}.recap .steps0 li.now .n{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .recap .rcta{width:100%;border:none;border-radius:8px;padding:11px;font-size:13px;font-weight:800;margin-top:11px;}
+  .recap .rcta.off{background:var(--mute);color:#fff;cursor:not-allowed;}
+  .recap .rhelp{font-size:10px;color:var(--mute);text-align:center;margin-top:7px;}
+  .recap .rreassure{border-top:1px solid var(--line2);margin-top:12px;padding-top:11px;display:flex;flex-direction:column;gap:6px;}
+  .recap .rr{font-size:10.5px;color:var(--ink2);display:flex;gap:6px;align-items:center;}
+  .recap .rr b{color:var(--ink);}.recap .rr .i{color:var(--accent);}
+
+  /* fourche */
+  .fork-primary{background:var(--accent);color:#fff;border-radius:8px;padding:12px;text-align:center;}
+  .fork-primary .l{font-size:13.5px;font-weight:800;}
+  .fork-primary .s{font-size:10.5px;opacity:.9;margin-top:2px;}
+  .fork-or{text-align:center;font-size:10px;color:var(--mute);margin:9px 0;position:relative;}
+  .fork-or::before,.fork-or::after{content:"";position:absolute;top:50%;width:38%;height:1px;background:var(--line);}
+  .fork-or::before{left:0;}.fork-or::after{right:0;}
+  .fork-sec{border:1px solid var(--line);border-radius:8px;padding:11px;background:#fff;}
+  .fork-sec .l{font-size:12px;font-weight:800;display:flex;justify-content:space-between;align-items:baseline;}
+  .fork-sec .l .p{font-size:13px;}
+  .fork-sec .s{font-size:10.5px;color:var(--accent);margin-top:3px;font-weight:700;}
+  .fork-sec .go{margin-top:8px;border:1px solid var(--ink);border-radius:6px;padding:7px;text-align:center;font-size:11.5px;font-weight:700;}
+  .fork-neutre{width:100%;margin-top:10px;border:1px solid var(--ink);background:#fff;color:var(--ink);border-radius:8px;padding:11px;font-size:12.5px;font-weight:700;cursor:pointer;}
+
+  .callout{position:absolute;font-size:10.5px;color:var(--note);background:var(--note-bg);border:1px solid #ecc6bb;border-radius:6px;padding:5px 9px;z-index:4;max-width:185px;line-height:1.35;}
+
+  /* modale échantillon */
+  .modal{border:1px solid var(--line);border-radius:10px;background:#fff;max-width:520px;box-shadow:0 6px 24px rgba(0,0,0,.12);overflow:hidden;}
+  .modal .mh{padding:14px 16px;border-bottom:1px solid var(--line);}
+  .modal .mh h3{margin:0;font-size:14px;}
+  .modal .mh p{margin:3px 0 0;font-size:11.5px;color:var(--ink2);}
+  .modal .mb{padding:16px;}
+  .varrow{display:flex;align-items:center;gap:10px;padding:9px;border:1px solid var(--line);border-radius:7px;margin-bottom:8px;}
+  .varrow.sel{border-color:var(--accent);border-width:2px;}
+  .varrow .vt{width:32px;height:38px;border:1px solid var(--line);border-radius:4px;background:var(--fill);flex-shrink:0;}
+  .varrow .vn{font-size:11.5px;font-weight:700;}
+  .varrow .vp2{font-size:11px;color:var(--ink2);}
+  .varrow .vck{margin-left:auto;width:20px;height:20px;border-radius:50%;border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:11px;font-weight:800;}
+  .varrow .vadd{margin-left:auto;border:1px solid var(--line);border-radius:6px;padding:5px 10px;font-size:11px;}
+  .cntbar{background:var(--fill2);border:1px solid var(--line);border-radius:7px;padding:9px 12px;font-size:11.5px;display:flex;justify-content:space-between;align-items:center;margin:4px 0 12px;}
+  .cntbar b{color:var(--ink);}
+  .full{color:var(--note);font-weight:700;}
+  .modal .mfoot{border-top:1px solid var(--line);padding:13px 16px;display:flex;align-items:center;gap:12px;}
+  .modal .mtot{font-size:11px;color:var(--ink2);}.modal .mtot b{font-size:15px;color:var(--ink);}
+  .modal .mcta{margin-left:auto;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:11px 18px;font-size:13px;font-weight:800;}
+  .acctnote{font-size:10.5px;color:var(--ink2);background:var(--fill2);border-radius:6px;padding:8px 10px;margin-top:10px;display:flex;gap:7px;align-items:flex-start;}
+  .acctnote .i{color:var(--accent);}
+
+  .notes{margin-top:40px;border-top:2px solid var(--ink);padding-top:20px;}
+  .notes h2{font-size:15px;margin:0 0 12px;}
+  .note-item{display:flex;gap:11px;padding:9px 0;border-bottom:1px solid var(--line2);font-size:12.5px;}
+  .note-item .marker{margin-top:1px;flex-shrink:0;}.note-item span{color:var(--ink2);}.note-item b{color:var(--ink);}
+  .arb{margin-top:22px;background:var(--note-bg);border:1px solid #ecc6bb;border-radius:8px;padding:15px 18px;}
+  .arb h3{margin:0 0 9px;font-size:13px;color:var(--note);}
+  .arb ul{margin:0;padding-left:18px;font-size:12.5px;}.arb li{margin-bottom:7px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="doc-head">
+    <h1>Dynamiz — État zéro sans redondance · fourche neutre/marquage · échantillon</h1>
+    <p>v260728 · la quantité ouvre la commande · deux voies assumées · échantillon payant filtré</p>
+  </div>
+  <div class="legend">
+    <span><span class="sw" style="background:var(--accent)"></span> Voie mise en avant (marquage)</span>
+    <span><span class="sw" style="background:#fff;border:1px solid var(--ink)"></span> Voie disponible (neutre)</span>
+    <span><span class="marker">1</span> Décision annotée</span>
+  </div>
+
+  <!-- ============ 1. ÉTAT ZÉRO ============ -->
+  <div class="frame-label">1 · État zéro — la colonne appelle la quantité, plus aucune redondance de prix</div>
+  <div class="sub"><span class="marker">1</span> L'ancrage prix « à partir de » vit <b>uniquement en haut de fiche</b> (SEO, premier regard). La colonne ne le répète plus : tant qu'il n'y a pas de quantité, aucune commande n'est possible, donc elle <b>appelle la quantité</b> au lieu d'afficher un prix. Redondance supprimée. L'échantillon vit près de la galerie, comme geste d'évaluation.</div>
+
+  <div class="screen">
+    <div class="vp">
+      <div class="vp-w">↔ 1920 px</div>
+      <div class="band"><div class="inner"><span class="logo">DYNAMIZ</span>
+        <span class="nav">Objets · Textiles · RSE · Secteurs · Nouveautés</span><span class="icons">🔍 ✉ 👤 🛍</span></div></div>
+      <div class="breath">
+        <div class="container">
+          <div style="padding:12px 0 0;font-size:11px;color:var(--mute);">Accueil › Textiles › Sweat-shirts › Condor</div>
+          <div style="font-size:18px;font-weight:800;margin:5px 0 2px;">Sweat-Shirt Condor à personnaliser</div>
+          <div style="font-size:11px;color:var(--mute);margin-bottom:6px;">DYN-00071847</div>
+
+          <div class="top">
+            <div class="gal">
+              <div class="thumbs"><div class="thumb"></div><div class="thumb"></div><div class="thumb"></div></div>
+              <div class="ph hero">galerie photo réelle<br>pleine hauteur à l'état zéro</div>
+            </div>
+            <div class="ident">
+              <div class="brand">SOL'S</div>
+              <div style="font-size:11px;color:var(--ink2);">Aperçu couleur : <b style="color:var(--ink)">Blanc</b></div>
+              <div class="vrow"><i></i><i></i><i></i><i></i><i></i><span class="more">+16</span></div>
+              <div class="anchor">
+                <div class="big">dès 12,47 € <small>HT — sans marquage</small></div>
+                <div class="qmin">Quantité minimum : 10 pièces</div>
+              </div>
+              <div style="font-size:11px;color:var(--ink2);">📞 Appeler · 💬 Chat · 📄 <span style="color:var(--accent);text-decoration:underline;">Demander un devis</span></div>
+            </div>
+          </div>
+
+          <div class="layout">
+            <div class="main">
+              <div class="step" style="border-top:none;">
+                <div class="step-h"><span class="step-n">1</span><h3>Combien d'articles ?</h3></div>
+                <div class="colorpick"><span class="cchip"><span class="sq"></span> Blanc</span><span class="addc"><span class="marker">2b</span> + ajouter une couleur</span></div>
+                <div class="sizegrid">
+                  <div class="sg-row"><div class="cth"></div><div class="cnm">Blanc</div>
+                    <div class="sg-sizes">
+                      <div class="ssz"><div class="l">XS</div><input value="0"></div>
+                      <div class="ssz"><div class="l">S</div><input value="0"></div>
+                      <div class="ssz"><div class="l">M</div><input value="0"></div>
+                      <div class="ssz"><div class="l">L</div><input value="0"></div>
+                      <div class="ssz"><div class="l">XL</div><input value="0"></div>
+                      <div class="ssz"><div class="l">XXL</div><input value="0"></div>
+                    </div><div class="sg-ct">0</div></div>
+                </div>
+                <div class="sg-tot"><span>Total : <b>0</b> pièce</span><span style="color:var(--note);font-weight:700;">↑ saisissez vos quantités pour voir les prix</span></div>
+                <div style="font-size:11px;color:var(--ink2);margin-top:11px;"><span class="marker">2</span> Quantité minimum : 10 pièces</div>
+                <div style="font-size:11px;margin-top:5px;"><span style="color:var(--accent);text-decoration:underline;">Jugez de la qualité en commandant un échantillon</span></div>
+              </div>
+              <div class="step">
+                <div class="step-h"><span class="step-n">2</span><h3>Quelle personnalisation ?</h3>
+                  <span style="font-size:11px;color:var(--ink2);margin-left:auto;"><span class="marker">5</span> prix débloqués par la quantité</span></div>
+                <div class="tcards">
+                  <div class="tcard" style="opacity:.7"><div class="ti"></div><div class="tb"><div class="tn">Broderie</div><div class="tv">—</div></div></div>
+                  <div class="tcard" style="opacity:.7"><div class="ti"></div><div class="tb"><div class="tn">Sérigraphie</div><div class="tv">—</div></div></div>
+                  <div class="tcard" style="opacity:.7"><div class="ti"></div><div class="tb"><div class="tn">DTF</div><div class="tv">—</div></div></div>
+                  <div class="tcard" style="opacity:.7"><div class="ti"></div><div class="tb"><div class="tn">Flex</div><div class="tv">—</div></div></div>
+                  <div class="tcard" style="opacity:.7"><div class="ti"></div><div class="tb"><div class="tn">Transfert</div><div class="tv">—</div></div></div>
+                </div>
+              </div>
+            </div>
+
+            <div style="position:relative;">
+              <div class="callout" style="top:70px;right:-8px;"><span class="marker">3</span> aucun prix ici tant que la quantité n'est pas saisie</div>
+              <div class="recap">
+                <div class="rhead"><div class="rthumb"></div>
+                  <div><div class="rname">Sweat Condor</div><div class="rbrand">SOL'S · Blanc</div></div></div>
+                <div class="rbody">
+                  <div class="zx"><span class="marker">4</span> Indiquez vos quantités à gauche — prix, délai et options de commande s'afficheront ici.</div>
+                  <ul class="steps0">
+                    <li class="now"><span class="n">1</span> Quantité &amp; couleurs</li>
+                    <li><span class="n">2</span> Personnalisation <span style="color:var(--mute)">(optionnelle)</span></li>
+                  </ul>
+                  <button class="rcta off">Composez votre projet</button>
+                  <div class="rreassure">
+                    <div class="rr"><span class="i">✔</span> <span><b>Simulation &amp; BAT gratuits</b></span></div>
+                    <div class="rr"><span class="i">✔</span> <span>Contrôle humain avant production</span></div>
+                    <div class="rr"><span class="i">★</span> <span>4,6/5 · Trustpilot · depuis 2006</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 2. APRÈS QUANTITÉ — LA FOURCHE ============ -->
+  <div class="frame-label">2 · Après la quantité — la fourche : personnaliser ou commander neutre</div>
+  <div class="sub"><span class="marker">5</span> Dès le minimum atteint, la colonne devient actionnable : elle affiche le <b>prix courant</b> (le neutre, seul connu), invite à continuer la personnalisation à gauche, et ne garde qu'<b>un seul bouton</b> — l'échappatoire « commander sans marquage ». Personnaliser n'a pas de bouton : c'est la suite du parcours, pas une action à déclencher.</div>
+
+  <div class="screen">
+    <div class="vp">
+      <div class="breath">
+        <div class="container">
+          <div class="layout" style="padding-top:20px;">
+            <div class="main">
+              <div class="step" style="border-top:none;">
+                <div class="step-h"><span class="step-n">1</span><h3>Combien d'articles ? — 50 pièces</h3></div>
+                <div class="colorpick"><span class="cchip"><span class="sq"></span> Blanc</span><span class="cchip"><span class="sq" style="background:#3a4a6b"></span> Marine</span><span class="addc">+ ajouter une couleur</span></div>
+                <div class="sizegrid">
+                  <div class="sg-row"><div class="cth"></div><div class="cnm">Blanc</div>
+                    <div class="sg-sizes">
+                      <div class="ssz"><div class="l">XS</div><input value="0"></div>
+                      <div class="ssz"><div class="l">S</div><input value="0"></div>
+                      <div class="ssz"><div class="l">M</div><input class="f" value="8"></div>
+                      <div class="ssz"><div class="l">L</div><input class="f" value="7"></div>
+                      <div class="ssz"><div class="l">XL</div><input class="f" value="5"></div>
+                      <div class="ssz"><div class="l">XXL</div><input value="0"></div>
+                    </div><div class="sg-ct">20</div></div>
+                  <div class="sg-row"><div class="cth" style="background:#3a4a6b"></div><div class="cnm">Marine</div>
+                    <div class="sg-sizes">
+                      <div class="ssz"><div class="l">XS</div><input value="0"></div>
+                      <div class="ssz"><div class="l">S</div><input value="0"></div>
+                      <div class="ssz"><div class="l">M</div><input class="f" value="12"></div>
+                      <div class="ssz"><div class="l">L</div><input class="f" value="11"></div>
+                      <div class="ssz"><div class="l">XL</div><input class="f" value="7"></div>
+                      <div class="ssz"><div class="l">XXL</div><input value="0"></div>
+                    </div><div class="sg-ct">30</div></div>
+                </div>
+                <div class="sg-tot"><span>Total projet : <b>50</b> pièces</span><span class="ok" style="color:var(--accent);font-weight:700;">✓ minimum atteint</span><span style="color:var(--ink2);"><span class="marker">5b</span> le dégressif se calcule sur le total, toutes couleurs</span></div>
+              </div>
+              <div class="step">
+                <div class="step-h"><span class="step-n">2</span><h3>Quelle personnalisation ?</h3>
+                  <span style="font-size:11px;color:var(--ink2);margin-left:auto;">comparez — prix pour 50 pièces</span></div>
+                <div class="tcards">
+                  <div class="tcard"><div class="ti"></div><div class="tb"><div class="tn">Broderie</div><div class="tv" style="color:var(--ink)">931 €</div></div></div>
+                  <div class="tcard"><div class="ti"></div><div class="tb"><div class="tn">Sérigraphie</div><div class="tv" style="color:var(--accent)">831 €</div></div></div>
+                  <div class="tcard"><div class="ti"></div><div class="tb"><div class="tn">DTF</div><div class="tv" style="color:var(--accent)">805 €</div></div></div>
+                  <div class="tcard"><div class="ti"></div><div class="tb"><div class="tn">Flex</div><div class="tv" style="color:var(--ink)">1065 €</div></div></div>
+                  <div class="tcard" style="opacity:.5"><div class="ti"></div><div class="tb"><div class="tn">Transfert</div><div class="tv">—</div></div></div>
+                </div>
+              </div>
+            </div>
+
+            <div style="position:relative;">
+              <div class="callout" style="top:130px;right:-8px;"><span class="marker">6</span> le prix courant d'abord ; personnaliser se fait à gauche, sans bouton</div>
+              <div class="recap">
+                <div class="rhead"><div class="rthumb"></div>
+                  <div><div class="rname">Sweat Condor</div><div class="rbrand">SOL'S</div>
+                    <div class="rcol"><i class="on"></i><i class="on" style="background:#3a4a6b"></i></div></div></div>
+                <div class="rbody">
+                  <div style="font-size:11px;color:var(--ink2);margin-bottom:10px;"><b style="color:var(--ink)">50 pièces</b> · Blanc (20) + Marine (30)</div>
+
+                  <!-- prix courant = neutre, seul connu -->
+                  <div style="text-align:center;padding-bottom:12px;border-bottom:1px solid var(--line2);margin-bottom:12px;">
+                    <div style="font-size:10.5px;color:var(--ink2);text-transform:uppercase;letter-spacing:.4px;"><span class="marker">6</span> prix sans marquage</div>
+                    <div style="font-size:24px;font-weight:800;">704,00 € <small style="font-size:12px;font-weight:600;color:var(--ink2)">HT</small></div>
+                    <div style="font-size:10.5px;color:var(--ink2);">soit 14,08 €/pièce</div>
+                  </div>
+
+                  <!-- la suite du parcours se fait à gauche, sans bouton -->
+                  <div style="font-size:11.5px;color:var(--ink);background:var(--accent-soft);border:1px solid var(--accent);border-radius:7px;padding:10px 12px;">
+                    <span class="marker">7</span> <b>Choisissez votre personnalisation à gauche</b> — le prix se met à jour à chaque étape.
+                  </div>
+
+                  <!-- seule action-bouton : l'échappatoire neutre -->
+                  <button class="fork-neutre"><span class="marker">8</span> Commander sans marquage<br><span style="font-size:10.5px;font-weight:400;color:var(--ink2);">livré sous 3 jours ouvrés</span></button>
+
+                  <div class="rreassure">
+                    <div class="rr"><span class="i">✔</span> <span><b>BAT gratuit</b> avant toute production marquée</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 2bis. APRÈS CHOIX TECHNIQUE ============ -->
+  <div class="frame-label">2 bis · Une technique choisie — le neutre disparaît, place au panier</div>
+  <div class="sub"><span class="marker">9</span> Dès qu'une technique est sélectionnée à l'étape 2, le client a exprimé un choix de marquage : le bouton « Commander sans marquage » <b>disparaît</b> (il n'a plus lieu d'être proposé) et la colonne affiche l'action terminale normale — le prix marqué et « Ajouter au panier ». La personnalisation ne s'est « déclenchée » par aucun bouton : elle s'est faite en descendant dans les étapes.</div>
+
+  <div class="screen">
+    <div class="vp">
+      <div class="breath">
+        <div class="container">
+          <div class="layout" style="padding-top:20px;">
+            <div class="main">
+              <div class="step" style="border-top:none;">
+                <div class="step-h"><span class="step-n" style="background:var(--accent)">✓</span><h3>Combien d'articles ? — 50 pièces</h3>
+                  <span style="font-size:11px;color:var(--ink2);margin-left:auto;text-decoration:underline;">modifier</span></div>
+              </div>
+              <div class="step">
+                <div class="step-h"><span class="step-n" style="background:var(--accent)">✓</span><h3>Personnalisation : Sérigraphie</h3>
+                  <span style="font-size:11px;color:var(--ink2);margin-left:auto;text-decoration:underline;">changer de technique</span></div>
+                <div class="tcards">
+                  <div class="tcard" style="opacity:.45"><div class="ti"></div><div class="tb"><div class="tn">Broderie</div><div class="tv">931 €</div></div></div>
+                  <div class="tcard" style="border-color:var(--accent);border-width:2px;"><div class="ti"></div><div class="tb"><div class="tn" style="color:var(--accent)">Sérigraphie ✓</div><div class="tv" style="color:var(--accent)">831 €</div></div></div>
+                  <div class="tcard" style="opacity:.45"><div class="ti"></div><div class="tb"><div class="tn">DTF</div><div class="tv">805 €</div></div></div>
+                  <div class="tcard" style="opacity:.45"><div class="ti"></div><div class="tb"><div class="tn">Flex</div><div class="tv">1065 €</div></div></div>
+                  <div class="tcard" style="opacity:.3"><div class="ti"></div><div class="tb"><div class="tn">Transfert</div><div class="tv">—</div></div></div>
+                </div>
+              </div>
+              <div class="step">
+                <div class="step-h"><span class="step-n">3</span><h3>Où placer votre logo ?</h3></div>
+                <span class="lockmsg" style="border-style:solid;">Cœur poitrine · + ajouter un emplacement</span>
+              </div>
+            </div>
+
+            <div style="position:relative;">
+              <div class="callout" style="top:150px;right:-8px;"><span class="marker">10</span> plus de bouton neutre : un choix de marquage a été fait</div>
+              <div class="recap">
+                <div class="rhead"><div class="rthumb"></div>
+                  <div><div class="rname">Sweat Condor</div><div class="rbrand">SOL'S · Sérigraphie</div>
+                    <div class="rcol"><i class="on"></i><i class="on" style="background:#3a4a6b"></i></div></div></div>
+                <div class="rbody">
+                  <div style="font-size:11px;color:var(--ink2);margin-bottom:10px;"><b style="color:var(--ink)">50 pièces</b> · Sérigraphie · 1 emplacement</div>
+
+                  <!-- détail chiffré -->
+                  <div style="font-size:11px;color:var(--ink2);border-bottom:1px solid var(--line2);padding-bottom:10px;margin-bottom:10px;">
+                    <div style="display:flex;justify-content:space-between;padding:2px 0;"><span>Articles (neutre)</span><span>704,00 €</span></div>
+                    <div style="display:flex;justify-content:space-between;padding:2px 0;"><span>Marquage sérigraphie</span><span>+ 97,00 €</span></div>
+                    <div style="display:flex;justify-content:space-between;padding:2px 0;"><span>Frais technique <span style="color:var(--mute)">(fixe)</span></span><span>+ 30,00 €</span></div>
+                  </div>
+                  <div style="text-align:center;margin-bottom:12px;">
+                    <div style="font-size:10.5px;color:var(--ink2);text-transform:uppercase;letter-spacing:.4px;"><span class="marker">11</span> total projet</div>
+                    <div style="font-size:24px;font-weight:800;">831,00 € <small style="font-size:12px;font-weight:600;color:var(--ink2)">HT</small></div>
+                    <div style="font-size:10.5px;color:var(--ink2);">soit 16,62 €/pièce marqué</div>
+                  </div>
+
+                  <button class="mcta" style="width:100%;"><span class="marker" style="box-shadow:0 0 0 1.5px #fff">12</span> Ajouter au panier</button>
+
+                  <div class="rreassure">
+                    <div class="rr"><span class="i">✔</span> <span><b>BAT gratuit</b> avant production · vous validez avant qu'on imprime</span></div>
+                    <div class="rr"><span class="i">★</span> <span>4,6/5 · Trustpilot · depuis 2006</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 3. ÉCHANTILLON DANS LA PAGE ============ -->
+  <div class="frame-label">3 · L'échantillon — modale en overlay sur la fiche, ajout au panier</div>
+  <div class="sub"><span class="marker">13</span> Ouverte par le lien fin sous les quantités, la modale se superpose à la fiche (assombrie). Elle prépare des lignes « Échantillon » et les <b>ajoute au panier</b> — pas de tunnel de paiement séparé : l'échantillon suit le fork et la création de compte du panier existant. Le compte obligatoire est donc déjà couvert par le tunnel.</div>
+
+  <div class="screen">
+    <div class="vp" style="background:#2f2f2f;min-height:760px;">
+      <div class="vp-w">↔ 1920 px · modale ouverte</div>
+      <!-- fiche grisée derrière -->
+      <div style="opacity:.32;pointer-events:none;filter:grayscale(.3);">
+        <div class="band"><div class="inner"><span class="logo">DYNAMIZ</span><span class="nav">Objets · Textiles · RSE</span><span class="icons">🔍 ✉ 👤 🛍</span></div></div>
+        <div style="max-width:1180px;margin:0 auto;padding:16px 24px;background:var(--paper);">
+          <div style="font-size:18px;font-weight:800;">Sweat-Shirt Condor à personnaliser</div>
+          <div class="top" style="border:none;">
+            <div class="gal"><div class="thumbs"><div class="thumb"></div><div class="thumb"></div></div><div class="ph hero" style="min-height:150px;">galerie</div></div>
+            <div class="ident"><div class="anchor"><div class="big">dès 12,47 €</div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- overlay modale, alignée haut pour être vue entière -->
+      <div style="position:absolute;inset:0;display:flex;align-items:flex-start;justify-content:center;padding:32px 20px;">
+        <div class="modal" style="max-width:560px;width:100%;">
+          <div class="mh" style="display:flex;align-items:flex-start;">
+            <div><h3>Commander un échantillon — Sweat Condor</h3>
+              <p>Recevez l'article réel à votre nom pour juger de la qualité avant d'engager votre commande.</p></div>
+            <span style="margin-left:auto;font-size:18px;color:var(--mute);cursor:pointer;">✕</span>
+          </div>
+          <div class="mb">
+            <div class="cntbar"><span><span class="marker">14</span> <b>2</b> / 3 échantillons</span><span>1 pièce par taille &amp; couleur</span></div>
+
+            <!-- variantes déjà choisies -->
+            <div class="varrow sel"><div class="vt"></div><div><div class="vn">Blanc · M</div><div class="vp2">12,47 €</div></div><span style="margin-left:auto;font-size:11px;color:var(--note);text-decoration:underline;cursor:pointer;">retirer</span></div>
+            <div class="varrow sel"><div class="vt" style="background:#3a4a6b"></div><div><div class="vn">Marine · L</div><div class="vp2">12,47 €</div></div><span style="margin-left:auto;font-size:11px;color:var(--note);text-decoration:underline;cursor:pointer;">retirer</span></div>
+
+            <!-- constructeur de la 3ᵉ variante -->
+            <div class="builder">
+              <div class="bl"><span class="marker">15</span> Ajouter un 3ᵉ échantillon — couleur</div>
+              <div class="swrow">
+                <span class="swz" style="background:#fff"></span><span class="swz" style="background:#3a4a6b"></span>
+                <span class="swz on" style="background:#6b6b6b"></span><span class="swz" style="background:#111"></span>
+                <span class="swz" style="background:#b33"></span><span class="swz" style="background:#e0b000"></span>
+                <span class="swz" style="background:#2f9e6f"></span><span class="swz" style="background:#7a4"></span>
+                <span class="swz" style="background:#c86"></span><span class="swz" style="background:#c39"></span>
+                <span class="swz" style="background:#96c"></span><span class="swz" style="background:#48c"></span>
+                <span class="swz" style="background:#0aa"></span><span class="swz" style="background:#8a5a2b"></span>
+                <span class="swz" style="background:#556"></span><span class="swz" style="background:#dcd7c9"></span>
+                <span class="swz" style="background:#f39"></span>
+              </div>
+              <div class="bl">taille</div>
+              <div class="swrow">
+                <span class="szbtn">XXS</span><span class="szbtn">XS</span><span class="szbtn on">S</span><span class="szbtn">M</span>
+                <span class="szbtn">L</span><span class="szbtn">XL</span><span class="szbtn">XXL</span><span class="szbtn">3XL</span>
+                <span class="szbtn">4XL</span><span class="szbtn">5XL</span>
+              </div>
+              <button class="btn p" style="width:100%;padding:9px;"><span class="marker">16</span> Ajouter cet échantillon — Gris chiné · S</button>
+            </div>
+
+            <div class="acctnote"><span class="i">🔒</span><span><span class="marker">17</span> Compte professionnel requis pour finaliser — expédié au nom de votre structure.</span></div>
+          </div>
+          <div class="mfoot" style="flex-direction:column;align-items:stretch;gap:0;">
+            <div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--ink2);padding:4px 0;">
+              <span>2 échantillons</span><span>24,94 €</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--ink2);padding:4px 0;border-bottom:1px solid var(--line2);margin-bottom:8px;">
+              <span><span class="marker">18</span> Forfait port <span style="color:var(--mute)">(1 ou plusieurs échantillons)</span></span><span>8,00 €</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div style="font-size:11px;color:var(--ink2);">Total HT<br><b style="font-size:16px;color:var(--ink)">32,94 €</b></div>
+              <button class="mcta"><span class="marker" style="box-shadow:0 0 0 1.5px #fff">19</span> Ajouter au panier</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sub" style="margin-top:14px;"><span class="marker">20</span> Dans le panier, la ligne apparaît étiquetée <b>« Échantillon — Blanc/M »</b>, à côté d'éventuelles commandes. Au-delà de 3 variantes, un message bascule vers le configurateur : <i>« Besoin de plus ? Composez votre commande »</i> — l'abus est renvoyé là où on veut le flux.</div>
+
+  <!-- ============ NOTES ============ -->
+  <div class="notes">
+    <h2>Notes de conception</h2>
+    <div class="note-item"><span class="marker">1</span><span><b>Redondance supprimée par partage des rôles.</b> Prix d'appel « dès X € » → haut de fiche uniquement. Colonne → actionnable, jamais répétitrice. Le point de bascule est la quantité : sans elle, rien à chiffrer, donc rien à afficher côté colonne.</span></div>
+    <div class="note-item"><span class="marker">2</span><span><b>Échantillon = lien fin sous les quantités</b>, pas d'encadré ni d'argumentaire. « Jugez de la qualité en commandant un échantillon » : une invitation, placée pile où le doute naît. Le minimum de quantité vit aussi là, dans la section 1.</span></div>
+    <div class="note-item"><span class="marker">3</span><span><b>La colonne ne montre aucun prix à l'état zéro.</b> Elle guide (produit, étapes, réassurance) et appelle la quantité. Le seul « prix » de la page est en haut de fiche.</span></div>
+    <div class="note-item"><span class="marker">4</span><span><b>Étape 2 annoncée « optionnelle ».</b> Dit dès l'état zéro que la personnalisation n'est pas obligatoire — le neutre est une voie légitime, pas un échec de parcours.</span></div>
+    <div class="note-item"><span class="marker">5</span><span><b>Cartes de technique visibles dès l'état zéro</b>, grisées, prix à « — ». On est sur l'article : les techniques possibles sont connues, autant les montrer en vitrine plutôt qu'un cadenas vide. La quantité reste le déclencheur. (Repris du wireframe B.)</span></div>
+    <div class="note-item"><span class="marker">5b</span><span><b>Quantité par couleur — une ligne par coloris.</b> Chaque couleur sélectionnée a sa propre rangée de tailles et son sous-total ; le total projet cumule tout. Sans ce rattachement, on ne sait pas combien de M en Blanc vs en Marine — indispensable pour la production et le BAT. Ajouter/retirer une couleur ne réinitialise jamais les autres.</span></div>
+    <div class="note-item"><span class="marker">6</span><span><b>La séquence : quantité → prix → choix.</b> Le prix affiché en premier est le seul connu tant qu'aucune technique n'est choisie — le neutre. Label sobre « prix sans marquage », <b>sans le mot « projet »</b> : on n'en parle qu'une fois la personnalisation démarrée.</span></div>
+    <div class="note-item"><span class="marker">7</span><span><b>Pas de bouton « Ajouter mon marquage ».</b> Le client est déjà dans le configurateur ; personnaliser est la <b>suite naturelle</b> (descendre vers l'étape 2), pas une action à déclencher. Un bouton pour « ouvrir » ce qui est déjà ouvert serait une porte au milieu du couloir — le travers du CTA-porte. À la place, un simple repère : « choisissez votre personnalisation à gauche ».</span></div>
+    <div class="note-item"><span class="marker">8</span><span><b>Un seul bouton dans la colonne : l'échappatoire neutre.</b> Le neutre est la seule action qui <i>court-circuite</i> la suite du parcours, donc la seule qui mérite un bouton. « Commander sans marquage / livré sous 3 jours ouvrés », toujours visible dès la quantité saisie. 90 % du catalogue est commandable neutre : à taguer et mesurer.</span></div>
+    <div class="note-item"><span class="marker">9</span><span><b>Une technique choisie → le neutre disparaît.</b> Le client a exprimé un choix de marquage : proposer encore « commander sans marquage » n'aurait plus de sens. Le bouton neutre cède la place à l'action terminale normale.</span></div>
+    <div class="note-item"><span class="marker">10</span><span><b>Personnalisation sans déclencheur.</b> Les étapes 1 et 2 se cochent au fur et à mesure ; aucun bouton n'a « lancé » le marquage. C'est la preuve que la fourche à deux boutons était de trop : le parcours se suffit.</span></div>
+    <div class="note-item"><span class="marker">11</span><span><b>Détail chiffré puis total.</b> Articles neutres + marquage + frais technique fixe, chacun sur sa ligne, puis le total projet. Le client voit d'où vient le prix — l'ancrage honnête « le marquage s'ajoute ».</span></div>
+    <div class="note-item"><span class="marker">12</span><span><b>« Ajouter au panier » = action terminale unique</b> une fois le marquage choisi. Le parcours a convergé vers une seule sortie claire, sans concurrence de boutons.</span></div>
+    <div class="note-item"><span class="marker">13</span><span><b>Modale en overlay sur la fiche assombrie</b> : le client reste dans le contexte du produit. Fermeture (✕) le ramène à sa configuration intacte.</span></div>
+    <div class="note-item"><span class="marker">14</span><span><b>Trois plafonds cumulés.</b> 1 pièce par variante (taille/couleur) · 3 variantes max par article · <b>3 articles max par commande</b> (soit 9 échantillons max). Sans eux, 10 tailles × 17 couleurs = 170 pièces possibles à prix coûtant — l'abus à tuer. Port : forfait unique à confirmer si articles multi-fournisseurs.</span></div>
+    <div class="note-item"><span class="marker">15</span><span><b>Constructeur couleur + taille, pas une liste.</b> À 170 combinaisons possibles, lister toutes les variantes serait ingérable. Le client compose : une couleur parmi 17, une taille parmi 10, puis ajoute — jusqu'aux plafonds. La modale scale quel que soit le nombre de déclinaisons.</span></div>
+    <div class="note-item"><span class="marker">16</span><span><b>« Ajouter cet échantillon » nomme la variante en cours</b> (« Gris chiné · S ») : le client confirme ce qu'il ajoute avant de le faire. Au plafond, le constructeur se désactive et bascule vers le configurateur.</span></div>
+    <div class="note-item"><span class="marker">17</span><span><b>Compte pro obligatoire</b>, géré <b>par le panier</b>, pas par la modale : filtre le particulier, capte le lead, expédie au nom de la structure. Une ligne, sans insister.</span></div>
+    <div class="note-item"><span class="marker">18</span><span><b>Forfait port en ligne séparée</b>, au-dessus du total : 8 € pour 1 ou plusieurs échantillons, jamais multiplié. Même logique que les frais techniques — un coût fixe montré comme tel ne se lit pas comme une surprise.</span></div>
+    <div class="note-item"><span class="marker">19</span><span><b>« Ajouter au panier », pas « valider ».</b> L'échantillon prépare des lignes de panier étiquetées « Échantillon » et suit le fork commander/devis et la création de compte du tunnel existant. Réutilise l'existant, pas de tunnel parallèle.</span></div>
+    <div class="note-item"><span class="marker">20</span><span><b>Ligne panier étiquetée « Échantillon »</b>, distincte d'une commande, peut cohabiter avec elle. Au-delà des plafonds, bascule vers le configurateur.</span></div>
+    <div class="note-item"><span class="marker">—</span><span><b>Remboursement non affiché</b> (rappel) : geste de closing du commercial, pas condition. Promis d'avance, il devient un piège sur le haut de gamme. Option 1 affichée, option 2 en coulisse.</span></div>
+  </div>
+
+  <div class="arb">
+    <h3>À arbitrer / vérifier</h3>
+    <ul>
+      <li><b>Libellé de l'atout neutre.</b> « Expédié sous ~3 jours » suppose du stock disponible : à vérifier que le délai neutre est réellement plus court que le marqué pour la majorité des articles, sinon retirer l'argument vitesse.</li>
+      <li><b>Port de l'échantillon : unique ou par variante ?</b> Ici modélisé en port unique (8 € pour 2-3 variantes d'un même article, un seul envoi). Confirmer que le fournisseur regroupe bien, sinon le total change.</li>
+      <li><b>Mesure du neutre.</b> Événement dédié dès le lancement (part des commandes neutres vs marquées) pour trancher son poids visuel sur données, pas sur intuition.</li>
+      <li><b>Échantillon multi-articles.</b> Ce wireframe traite un article. Si un client veut des échantillons de plusieurs produits différents, le plafond de 3 vaut-il par article ou par commande ? À trancher.</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>
