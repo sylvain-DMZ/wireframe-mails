@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dynamiz — Wireframe fusionné · Page article + configurateur · v260723</title>
+<style>
+  :root{
+    --ink:#2f2f2f; --ink2:#6b6b6b; --mute:#a2a2a2;
+    --line:#d8d8d8; --line2:#e8e8e8; --fill:#efefef; --fill2:#f7f7f7;
+    --paper:#fff; --bg:#f0f0f0;
+    --accent:#00918c; --accent-soft:#e6f2f1;
+    --note:#c14a2b; --note-bg:#fbeee9;
+    --lock:#f2f2f2;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.45;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1400px;margin:0 auto;padding:28px 20px 90px;}
+
+  .doc-head{border-bottom:2px solid var(--ink);padding-bottom:14px;margin-bottom:10px;}
+  .doc-head h1{font-size:19px;margin:0 0 3px;}
+  .doc-head p{margin:0;color:var(--ink2);font-size:13px;}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;margin:14px 0 28px;font-size:12px;color:var(--ink2);}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .sw{width:22px;height:12px;border-radius:2px;display:inline-block;border:1px solid var(--line);}
+  .marker{display:inline-flex;align-items:center;justify-content:center;min-width:17px;height:17px;
+    padding:0 4px;border-radius:9px;background:var(--note);color:#fff;font-size:10.5px;font-weight:700;vertical-align:middle;}
+
+  .frame-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;
+    color:var(--ink2);margin:36px 0 12px;display:flex;align-items:center;gap:10px;}
+  .frame-label::after{content:"";flex:1;height:1px;background:var(--line);}
+
+  .browser{background:var(--paper);border:1px solid var(--line);border-radius:8px;overflow:hidden;position:relative;}
+  .browser-bar{background:#e9e9e9;padding:8px 12px;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--line);}
+  .dot{width:9px;height:9px;border-radius:50%;background:#c9c9c9;}
+  .url{flex:1;background:#fff;border-radius:4px;height:19px;margin-left:8px;font-size:11px;color:var(--mute);
+    display:flex;align-items:center;padding:0 9px;}
+
+  .phone{width:390px;background:var(--paper);border:8px solid #1f1f1f;border-radius:30px;overflow:hidden;position:relative;}
+  .notch{height:20px;background:#1f1f1f;}
+
+  .site-head{background:#3a3a3a;color:#eee;padding:11px 18px;display:flex;align-items:center;gap:14px;font-size:12px;}
+  .site-head .logo{font-weight:800;letter-spacing:.5px;color:#fff;}
+  .site-head .nav{display:flex;gap:14px;color:#cfcfcf;flex-wrap:wrap;}
+  .site-head .icons{margin-left:auto;display:flex;gap:12px;color:#cfcfcf;}
+  .tag{font-size:10px;color:var(--note);background:var(--note-bg);border:1px dashed var(--note);
+    border-radius:4px;padding:1px 6px;white-space:nowrap;}
+
+  .crumb{font-size:11px;color:var(--mute);padding:12px 24px 0;}
+  .h1{font-size:21px;font-weight:800;margin:6px 24px 2px;line-height:1.2;}
+  .ref{font-size:11px;color:var(--mute);margin:0 24px 16px;}
+
+  /* ---- top block : landing ---- */
+  .top{display:grid;grid-template-columns:1.15fr .85fr;gap:28px;padding:0 24px 22px;border-bottom:1px solid var(--line2);}
+  .gallery{display:flex;gap:10px;}
+  .thumbs{display:flex;flex-direction:column;gap:8px;}
+  .thumb{width:46px;height:54px;background:var(--fill);border:1px solid var(--line);border-radius:4px;}
+  .ph{background:repeating-linear-gradient(45deg,var(--fill2),var(--fill2) 9px,var(--fill) 9px,var(--fill) 18px);
+    border:1px solid var(--line);border-radius:6px;display:flex;align-items:center;justify-content:center;
+    color:var(--mute);font-size:11px;text-align:center;position:relative;}
+  .hero{flex:1;min-height:300px;}
+  .badges{position:absolute;top:8px;left:8px;display:flex;gap:5px;flex-wrap:wrap;max-width:80%;}
+  .badge{background:#fff;border:1px solid var(--line);border-radius:10px;font-size:9.5px;padding:2px 7px;color:var(--ink2);}
+  .badge.promo{background:var(--note-bg);border-color:var(--note);color:var(--note);font-weight:700;}
+
+  .ident{display:flex;flex-direction:column;gap:13px;}
+  .brand{font-size:11px;font-weight:700;letter-spacing:1px;color:var(--ink2);text-transform:uppercase;}
+  .vlabel{font-size:11px;color:var(--ink2);margin-bottom:5px;}
+  .vlabel b{color:var(--ink);}
+  .vrow{display:flex;gap:6px;align-items:center;flex-wrap:nowrap;}
+  .vrow i{width:32px;height:38px;background:var(--fill);border:1px solid var(--line);border-radius:4px;flex-shrink:0;}
+  .vrow i:first-child{border-color:var(--accent);border-width:2px;}
+  .more{min-width:36px;height:38px;border:1px dashed var(--ink2);border-radius:4px;display:flex;align-items:center;
+    justify-content:center;font-size:11px;font-weight:700;color:var(--ink2);background:#fff;padding:0 6px;flex-shrink:0;}
+
+  .anchor{border:1px solid var(--line);border-radius:8px;padding:12px 14px;background:var(--fill2);}
+  .anchor .big{font-size:23px;font-weight:800;}
+  .anchor .big small{font-size:12px;font-weight:600;color:var(--ink2);}
+  .anchor .sub{font-size:11.5px;color:var(--ink2);margin-top:2px;}
+  .anchor .qmin{font-size:11.5px;font-weight:700;margin-top:5px;}
+  .anchor .lnk{font-size:11px;color:var(--accent);text-decoration:underline;margin-top:5px;display:inline-block;}
+  .anchor .devis-line{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);font-size:12px;color:var(--ink);}
+
+  .reassure{display:flex;gap:8px;flex-wrap:wrap;}
+  .reassure .r{flex:1;min-width:86px;border:1px solid var(--line);border-radius:6px;padding:8px;
+    font-size:10.5px;color:var(--ink2);text-align:center;background:#fff;}
+  .reassure .r b{display:block;color:var(--ink);font-size:11px;}
+  .reassure .r.key{border-color:var(--accent);color:var(--accent);}
+  .reassure .r.key b{color:var(--accent);}
+  .help{display:flex;gap:14px;font-size:11px;color:var(--ink2);border-top:1px solid var(--line2);padding-top:10px;}
+  .help b{display:block;font-size:13px;}
+  .help .dv{color:var(--accent);text-decoration:underline;}
+  .neutral-lnk{font-size:12px;color:var(--ink2);text-decoration:underline;}
+
+  /* ---- configurateur pleine largeur ---- */
+  .config{padding:24px 24px 0;}
+  .config-intro{display:flex;align-items:baseline;gap:12px;margin-bottom:4px;}
+  .config-intro h2{font-size:17px;font-weight:800;margin:0;}
+  .config-intro span{font-size:12px;color:var(--ink2);}
+
+  .step{border-top:1px solid var(--line2);padding:20px 0;}
+  .step-h{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+  .step-n{width:23px;height:23px;border-radius:50%;background:var(--ink);color:#fff;font-size:12px;font-weight:800;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .step-h h3{font-size:15px;font-weight:800;margin:0;}
+  .step-h .hint{font-size:11.5px;color:var(--ink2);margin-left:auto;}
+  .step.locked{background:var(--lock);margin:0 -24px;padding:20px 24px;}
+  .step.locked .step-n{background:var(--mute);}
+  .step.locked h3{color:var(--ink2);}
+  .lock-msg{font-size:12px;color:var(--ink2);background:#fff;border:1px dashed var(--line);
+    border-radius:6px;padding:9px 12px;display:inline-block;}
+
+  /* étape 1 : couleurs + tailles */
+  .colorpick{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+  .cchip{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:20px;padding:4px 11px 4px 5px;
+    font-size:11.5px;background:#fff;}
+  .cchip .sq{width:18px;height:18px;border-radius:50%;background:var(--fill);border:1px solid var(--line);}
+  .cchip.on{border-color:var(--accent);border-width:2px;color:var(--accent);font-weight:700;}
+  .cchip .x{color:var(--mute);font-size:12px;}
+  .addc{border:1px dashed var(--ink2);border-radius:20px;padding:5px 12px;font-size:11.5px;color:var(--ink2);background:#fff;}
+
+  .sizegrid{border:1px solid var(--line);border-radius:8px;overflow:hidden;}
+  .sg-row{display:flex;align-items:center;gap:12px;padding:11px 13px;border-bottom:1px solid var(--line2);}
+  .sg-row:last-child{border-bottom:none;}
+  .sg-row .cthumb{width:38px;height:46px;background:var(--fill);border:1px solid var(--line);border-radius:4px;flex-shrink:0;}
+  .sg-row .cname{font-size:12px;font-weight:700;min-width:74px;}
+  .sizes{display:flex;gap:9px;flex-wrap:wrap;flex:1;}
+  .size{text-align:center;}
+  .size small{display:block;font-size:9.5px;color:var(--mute);}
+  .size .lbl{font-size:11px;font-weight:700;margin-bottom:2px;}
+  .size input{width:48px;height:30px;border:1px solid var(--line);border-radius:4px;text-align:center;font-size:12px;
+    background:#fff;color:var(--ink);}
+  .size input.filled{border-color:var(--accent);font-weight:700;}
+  .sg-tot{background:var(--fill2);padding:10px 13px;font-size:12px;display:flex;gap:16px;align-items:center;}
+  .sg-tot b{font-size:14px;}
+  .ok{color:var(--accent);font-weight:700;}
+
+  /* étape 2 : techniques */
+  .tcards{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;}
+  .tcard{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff;position:relative;}
+  .tcard .timg{height:96px;background:repeating-linear-gradient(45deg,var(--fill2),var(--fill2) 8px,var(--fill) 8px,var(--fill) 16px);
+    display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--mute);}
+  .tcard .tb{padding:10px;}
+  .tcard .tn{font-size:12.5px;font-weight:800;margin-bottom:6px;}
+  .tcard .tp{font-size:17px;font-weight:800;}
+  .tcard .tp small{font-size:10.5px;font-weight:600;color:var(--ink2);}
+  .tcard .tf{font-size:10.5px;color:var(--ink2);margin-top:2px;}
+  .tcard .tmin{font-size:10.5px;margin-top:6px;padding-top:6px;border-top:1px solid var(--line2);color:var(--ink2);}
+  .tcard .tdel{font-size:10.5px;color:var(--ink2);}
+  .tproj{margin-top:7px;padding-top:7px;border-top:1px solid var(--line2);}
+  .tproj .lab{font-size:9.5px;color:var(--mute);text-transform:uppercase;letter-spacing:.4px;}
+  .tproj .val{font-size:14px;font-weight:800;}
+  .tdelta{display:inline-block;margin-top:4px;font-size:11px;font-weight:800;padding:2px 7px;border-radius:11px;}
+  .tdelta.save{background:var(--accent);color:#fff;}
+  .tdelta.more{background:var(--fill);color:var(--ink2);}
+  .tdelta.cur{background:var(--ink);color:#fff;}
+  .tcard.sel{border-color:var(--accent);border-width:2px;}
+  .tcard.cheap::before{content:"le moins cher";position:absolute;top:7px;left:7px;background:var(--accent);color:#fff;
+    font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;z-index:1;}
+  .tcard.off{opacity:.55;}
+  .tcard.off .tmin{color:var(--note);font-weight:700;}
+  .tcard.waiting .tp{color:var(--mute);}
+  .tcompat{font-size:9.5px;color:var(--ink2);margin-top:5px;display:flex;align-items:center;gap:4px;}
+  .tcompat .ic{width:13px;height:13px;border-radius:3px;background:var(--fill);border:1px solid var(--line);
+    display:inline-flex;align-items:center;justify-content:center;font-size:8px;flex-shrink:0;}
+
+  /* étape 3 : zones */
+  .zones{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;}
+  .zone{border:1px solid var(--line);border-radius:8px;padding:9px;background:#fff;text-align:center;}
+  .zone .zi{height:88px;margin-bottom:7px;}
+  .zone .zn{font-size:11.5px;font-weight:700;}
+  .zone .zd{font-size:10px;color:var(--mute);}
+  .zone .zp{font-size:12.5px;font-weight:800;margin-top:3px;}
+  .zone.sel{border-color:var(--accent);border-width:2px;}
+  .zone.off{opacity:.45;}
+  .zone.off .zn{color:var(--mute);}
+
+  .zonecfg{border:1px solid var(--accent);border-radius:8px;padding:13px;margin-top:12px;background:var(--accent-soft);}
+  .zonecfg .zh{display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:800;margin-bottom:10px;flex-wrap:wrap;}
+  .pill{background:#fff;border:1px solid var(--accent);color:var(--accent);border-radius:14px;
+    padding:3px 10px;font-size:11px;font-weight:700;}
+  .pill .ed{opacity:.7;font-weight:400;}
+  .upl{display:flex;gap:9px;align-items:center;flex-wrap:wrap;}
+  .btn{border:1px solid var(--line);border-radius:6px;padding:8px 13px;font-size:11.5px;background:#fff;color:var(--ink);}
+  .btn.p{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:700;}
+  .btn.g{background:var(--ink);color:#fff;border-color:var(--ink);font-weight:700;}
+  .card-in{background:#fff;border:1px solid var(--line);border-radius:7px;padding:12px;}
+  .ia{margin-top:11px;border:1px solid var(--note);background:#fff;border-radius:6px;padding:10px 12px;font-size:11.5px;}
+  .ia b{color:var(--note);}
+  .ia .acts{margin-top:7px;display:flex;gap:8px;flex-wrap:wrap;}
+
+  /* barre de suivi horizontale */
+  .bar{position:sticky;bottom:0;background:#fff;border-top:2px solid var(--ink);
+    box-shadow:0 -4px 14px rgba(0,0,0,.09);padding:11px 24px;display:flex;align-items:center;gap:18px;z-index:5;}
+  .bar .bth{width:34px;height:41px;background:var(--fill);border:1px solid var(--line);border-radius:4px;flex-shrink:0;}
+  .bar .bsum{font-size:11.5px;color:var(--ink2);line-height:1.3;}
+  .bar .bsum b{color:var(--ink);}
+  .bar .bprice{margin-left:auto;text-align:right;line-height:1.15;}
+  .bar .bprice .u{font-size:11px;color:var(--ink2);}
+  .bar .bprice .t{font-size:21px;font-weight:800;}
+  .bar .bdet{font-size:11px;color:var(--accent);text-decoration:underline;}
+  .bar .cta{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:13px 22px;font-size:14px;
+    font-weight:800;white-space:nowrap;}
+  .bar .cta.off{background:var(--mute);}
+  .bat{font-size:10px;color:var(--ink2);text-align:center;margin-top:3px;}
+  .bar.zero{border-top-color:var(--line);box-shadow:none;background:var(--fill2);}
+
+  /* détail déplié de la barre */
+  .bardet{border-top:1px solid var(--line);background:#fff;padding:14px 24px;}
+  .dtable{width:100%;border-collapse:collapse;font-size:12px;}
+  .dtable td{padding:6px 4px;border-bottom:1px solid var(--line2);}
+  .dtable .lbl{color:var(--ink2);}
+  .dtable .num{text-align:right;}
+  .dtable tr.tot td{border-bottom:none;font-weight:800;font-size:14px;padding-top:10px;}
+
+  /* onglets / bas de page */
+  .tabs{margin:28px 24px 0;}
+  .tablist{display:flex;gap:2px;border-bottom:2px solid var(--line);flex-wrap:wrap;}
+  .tab{padding:11px 15px;font-size:12.5px;font-weight:700;color:var(--ink2);border-radius:6px 6px 0 0;position:relative;top:2px;}
+  .tab.on{color:var(--ink);background:#fff;border:1px solid var(--line);border-bottom:none;box-shadow:0 -2px 0 var(--accent) inset;}
+  .tabpanel{padding:15px 4px;font-size:12px;color:var(--ink2);}
+  .section-t{font-size:14px;font-weight:800;margin:28px 24px 12px;}
+  .cards5{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;padding:0 24px;}
+  .card{border:1px solid var(--line2);border-radius:6px;padding:8px;}
+  .card .ci{height:92px;margin-bottom:7px;}
+  .card .ct{font-size:10.5px;color:var(--ink2);line-height:1.3;}
+  .card .cp{font-size:11px;font-weight:700;margin-top:3px;}
+  .reviews{background:var(--fill2);margin-top:26px;padding:16px 24px;display:flex;gap:12px;}
+  .review{flex:1;border:1px solid var(--line2);background:#fff;border-radius:6px;padding:10px;font-size:10.5px;color:var(--ink2);}
+  .stars{color:#e0b000;font-size:11px;}
+  .foot{background:#3a3a3a;color:#cfcfcf;padding:18px 24px;font-size:11px;display:flex;gap:26px;flex-wrap:wrap;}
+
+  /* mobile */
+  .m-scroll{max-height:660px;overflow-y:auto;position:relative;}
+  .m-pad{padding:0 14px;}
+  .m-bar{position:sticky;bottom:0;background:#fff;border-top:2px solid var(--ink);
+    box-shadow:0 -3px 10px rgba(0,0,0,.09);padding:9px 12px;z-index:5;}
+  .m-bar .l1{display:flex;align-items:center;gap:9px;margin-bottom:7px;}
+  .m-bar .l1 .bth{width:26px;height:32px;background:var(--fill);border:1px solid var(--line);border-radius:3px;}
+  .m-bar .l1 .s{font-size:10.5px;color:var(--ink2);line-height:1.25;}
+  .m-bar .l1 .s b{color:var(--ink);}
+  .m-bar .l1 .p{margin-left:auto;text-align:right;}
+  .m-bar .l1 .p .t{font-size:16px;font-weight:800;}
+  .m-bar .l1 .p .u{font-size:9.5px;color:var(--ink2);}
+  .m-bar .cta{width:100%;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:12px;
+    font-size:13.5px;font-weight:800;}
+  .m-bar .cta.off{background:var(--mute);}
+
+  /* variantes */
+  .vgrid{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+  .vbox{border:1px solid var(--line);border-radius:8px;background:#fff;overflow:hidden;}
+  .vbox .vh{background:var(--fill2);border-bottom:1px solid var(--line);padding:10px 14px;font-size:12px;font-weight:800;}
+  .vbox .vh small{display:block;font-weight:400;color:var(--ink2);font-size:11px;margin-top:2px;}
+  .vbox .vc{padding:14px;}
+
+  /* notes */
+  .notes{margin-top:44px;border-top:2px solid var(--ink);padding-top:20px;}
+  .notes h2{font-size:15px;margin:0 0 4px;}
+  .notes .hint{font-size:12px;color:var(--ink2);margin:0 0 16px;}
+  .note-item{display:flex;gap:11px;padding:9px 0;border-bottom:1px solid var(--line2);font-size:12.5px;}
+  .note-item .marker{margin-top:1px;flex-shrink:0;}
+  .note-item span{color:var(--ink2);}
+  .note-item b{color:var(--ink);}
+  .arb{margin-top:24px;background:var(--note-bg);border:1px solid #ecc6bb;border-radius:8px;padding:16px 18px;}
+  .arb h3{margin:0 0 10px;font-size:13px;color:var(--note);}
+  .arb ul{margin:0;padding-left:18px;font-size:12.5px;}
+  .arb li{margin-bottom:7px;}
+  .arb code{background:#fff;border:1px solid var(--line);border-radius:3px;padding:1px 5px;font-size:11.5px;}
+
+  @media(max-width:900px){
+    .top{grid-template-columns:1fr;}
+    .tcards,.zones,.cards5{grid-template-columns:repeat(2,1fr);}
+    .vgrid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="doc-head">
+    <h1>Dynamiz — Wireframe fusionné <b style="color:var(--note)">· VARIANTE B</b> : une seule technique par article</h1>
+    <p>v260723-B · décision d'équipe : pas de mix de techniques · la technique est globale, toutes les zones la partagent · IA de faisabilité en couche activable</p>
+  </div>
+
+  <div class="legend">
+    <span><span class="sw" style="background:var(--accent)"></span> Accent = action d'engagement</span>
+    <span><span class="sw" style="background:var(--lock)"></span> Étape verrouillée</span>
+    <span><span class="marker">1</span> Décision annotée (voir Notes)</span>
+    <span><span class="tag">inchangé</span> Hors périmètre</span>
+  </div>
+
+  <!-- ============ DESKTOP — NIVEAU A — ÉTAT ZÉRO ============ -->
+  <div class="frame-label">Desktop · niveau A · <b style="color:var(--note);margin-left:4px">état zéro — ce que voient 100 % des arrivées</b></div>
+
+  <div class="browser">
+    <div class="browser-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="url">dynamiz.fr / textiles / sweat-shirt-condor-sol-s</span></div>
+
+    <div class="site-head">
+      <span class="logo">DYNAMIZ</span><span class="tag">header inchangé</span>
+      <span class="nav">Objets · Textiles · RSE · Secteurs · Nouveautés</span>
+      <span class="icons">🔍 ✉ 👤 🛍</span>
+    </div>
+
+    <div class="crumb">Accueil › Textiles publicitaires › Sweat-shirts › Condor</div>
+    <div class="h1">Sweat-Shirt Unisexe à Capuche Condor à personnaliser</div>
+    <div class="ref">DYN-00071847</div>
+
+    <!-- TOP : rôle landing -->
+    <div class="top">
+      <div class="gallery">
+        <div class="thumbs"><div class="thumb"></div><div class="thumb"></div><div class="thumb"></div><div class="thumb"></div></div>
+        <div class="ph hero">
+          <div class="badges"><span class="badge">Nouveauté</span><span class="badge">Éco-conçu</span><span class="badge">France</span><span class="badge promo">−15 %</span></div>
+          <span><span class="marker">1</span> galerie photo réelle · zoom<br>bascule à la couleur sélectionnée</span>
+        </div>
+      </div>
+
+      <div class="ident">
+        <div class="brand">SOL'S</div>
+        <div>
+          <div class="vlabel"><span class="marker">2</span> Aperçu couleur : <b>Blanc</b> <span style="color:var(--mute)">— point de départ</span></div>
+          <div class="vrow"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><span class="more">+16</span></div>
+        </div>
+
+        <div class="anchor">
+          <span class="marker">3</span>
+          <div class="big" style="margin-top:6px">dès 12,47 € <small>HT — sans marquage</small></div>
+          <div class="sub">le marquage s'ajoute selon la technique et la quantité</div>
+          <div class="qmin">Quantité minimum : 10 pièces</div>
+          <a class="lnk">Voir les prix dégressifs</a>
+        </div>
+
+        <a class="neutral-lnk"><span class="marker">4</span> Commander sans marquage</a>
+
+        <div class="reassure">
+          <span class="marker">5</span>
+          <div class="r"><b>★ 4,6</b> Trustpilot</div>
+          <div class="r"><b>2006</b> 20 ans</div>
+          <div class="r"><b>France / UE</b> RSE</div>
+          <div class="r key"><b>Simulation &amp; BAT</b> gratuits</div>
+        </div>
+
+        <div class="help">
+          <span class="marker">6</span>
+          <div><b>📞</b> Nous appeler</div><div><b>💬</b> Chat en direct</div>
+          <div><b>📄</b> <span class="dv">Demander un devis</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONFIGURATEUR PLEINE LARGEUR -->
+    <div class="config">
+      <div class="config-intro">
+        <h2><span class="marker">7</span> Personnalisez votre projet</h2>
+        <span>prix et délai calculés en direct — aucun engagement</span>
+      </div>
+
+      <!-- étape 1 -->
+      <div class="step">
+        <div class="step-h"><span class="step-n">1</span><h3>Combien d'articles ?</h3>
+          <span class="hint"><span class="marker">8</span> minimum 10 pièces · plusieurs couleurs possibles</span></div>
+
+        <div class="colorpick">
+          <span class="cchip on"><span class="sq"></span> Blanc <span class="x">✕</span></span>
+          <span class="addc"><span class="marker">9</span> + ajouter une couleur</span>
+        </div>
+
+        <div class="sizegrid">
+          <div class="sg-row">
+            <div class="cthumb"></div><div class="cname">Blanc</div>
+            <div class="sizes">
+              <div class="size"><div class="lbl">XXS</div><input value="0"><small>st. 59</small></div>
+              <div class="size"><div class="lbl">XS</div><input value="0"><small>st. 151</small></div>
+              <div class="size"><div class="lbl">S</div><input value="0"><small>st. 791</small></div>
+              <div class="size"><div class="lbl">M</div><input value="0"><small>st. 2265</small></div>
+              <div class="size"><div class="lbl">L</div><input value="0"><small>st. 1993</small></div>
+              <div class="size"><div class="lbl">XL</div><input value="0"><small>st. 759</small></div>
+              <div class="size"><div class="lbl">XXL</div><input value="0"><small>st. 402</small></div>
+            </div>
+          </div>
+        </div>
+        <div class="sg-tot" style="border:1px solid var(--line);border-top:none;border-radius:0 0 8px 8px;">
+          <span>Total projet : <b>0</b> pièce</span>
+          <span style="color:var(--note);font-weight:700;">↑ saisissez vos quantités pour découvrir les prix de personnalisation</span>
+        </div>
+      </div>
+
+      <!-- étape 2 — état zéro -->
+      <div class="step">
+        <div class="step-h"><span class="step-n">2</span><h3>Quelle personnalisation ?</h3>
+          <span class="hint"><span class="marker">10</span> visuels réels · prix débloqués par la quantité</span></div>
+
+        <div class="tcards">
+          <div class="tcard waiting"><div class="timg">rendu broderie</div><div class="tb">
+            <div class="tn">Broderie</div><div class="tp">— <small>€/pièce</small></div>
+            <div class="tf">+ frais technique</div>
+            <div class="tcompat"><span class="ic">▤</span> idéale pour logo vectoriel, aplats</div>
+            <div class="tproj"><div class="lab">votre projet</div><div class="val" style="color:var(--mute)">—</div></div>
+            <div class="tmin">min. 10 pièces</div><div class="tdel">délai 9 j</div></div></div>
+          <div class="tcard waiting"><div class="timg">rendu sérigraphie</div><div class="tb">
+            <div class="tn">Sérigraphie</div><div class="tp">— <small>€/pièce</small></div>
+            <div class="tf">+ frais technique</div>
+            <div class="tcompat"><span class="ic">▤</span> aplats, jusqu'à quelques couleurs</div>
+            <div class="tproj"><div class="lab">votre projet</div><div class="val" style="color:var(--mute)">—</div></div>
+            <div class="tmin">min. 10 pièces</div><div class="tdel">délai 6 j</div></div></div>
+          <div class="tcard waiting"><div class="timg">rendu DTF</div><div class="tb">
+            <div class="tn">Impression DTF</div><div class="tp">— <small>€/pièce</small></div>
+            <div class="tf">+ frais technique</div>
+            <div class="tcompat"><span class="ic">◨</span> photos, dégradés, détails fins</div>
+            <div class="tproj"><div class="lab">votre projet</div><div class="val" style="color:var(--mute)">—</div></div>
+            <div class="tmin">min. 10 pièces</div><div class="tdel">délai 9 j</div></div></div>
+          <div class="tcard waiting"><div class="timg">rendu flex</div><div class="tb">
+            <div class="tn">Flex réfléchissant</div><div class="tp">— <small>€/pièce</small></div>
+            <div class="tf">+ frais technique</div>
+            <div class="tcompat"><span class="ic">▤</span> formes simples, texte</div>
+            <div class="tproj"><div class="lab">votre projet</div><div class="val" style="color:var(--mute)">—</div></div>
+            <div class="tmin">min. 10 pièces</div><div class="tdel">délai 9 j</div></div></div>
+          <div class="tcard waiting"><div class="timg">rendu transfert</div><div class="tb">
+            <div class="tn">Transfert sérigraphique</div><div class="tp">— <small>€/pièce</small></div>
+            <div class="tf">+ frais technique</div>
+            <div class="tcompat"><span class="ic">◨</span> multicolore, séries</div>
+            <div class="tproj"><div class="lab">votre projet</div><div class="val" style="color:var(--mute)">—</div></div>
+            <div class="tmin">min. 25 pièces</div><div class="tdel">délai 11 j</div></div></div>
+        </div>
+        <div style="font-size:11px;color:var(--ink2);margin-top:9px;"><span class="marker">10b</span> Repère de compatibilité sur chaque carte — statique, fiable, sans analyse. Le client s'oriente avant même de déposer son logo.</div>
+      </div>
+
+      <!-- étape 3 — verrouillée -->
+      <div class="step locked">
+        <div class="step-h"><span class="step-n">3</span><h3>Où placer votre logo ?</h3></div>
+        <span class="lock-msg"><span class="marker">11</span> Disponible après le choix de la personnalisation</span>
+      </div>
+    </div>
+
+    <!-- barre de suivi — état zéro -->
+    <div class="bar zero">
+      <div class="bth"></div>
+      <div class="bsum"><b>Votre projet</b><br>aucune quantité saisie</div>
+      <div class="bprice"><div class="u">article neutre</div><div class="t" style="color:var(--ink2)">dès 12,47 €</div></div>
+      <button class="cta off"><span class="marker" style="box-shadow:0 0 0 1.5px #fff">12</span> Ajouter au panier</button>
+    </div>
+
+    <!-- bas de page -->
+    <div class="tabs">
+      <div class="tablist">
+        <span class="tab on"><span class="marker">13</span> Description</span>
+        <span class="tab">Caractéristiques</span><span class="tab">Tarifs dégressifs</span>
+        <span class="tab">Marquages disponibles</span><span class="tab">Stocks</span><span class="tab">Fichiers à télécharger</span>
+      </div>
+      <div class="tabpanel">Manches montées · coupé cousu · poche kangourou · 80 % coton / 20 % polyester recyclé…
+        <span style="color:var(--mute)">(onglet actif par défaut → contenu indexé)</span></div>
+    </div>
+
+    <div class="section-t"><span class="marker">14</span> Ces articles pourraient aussi vous convenir</div>
+    <div class="cards5">
+      <div class="card"><div class="ph ci"></div><div class="ct">Veste polaire ajustable</div><div class="cp">dès 12,19 €</div></div>
+      <div class="card"><div class="ph ci"></div><div class="ct">Gilet col V Golden Men</div><div class="cp">dès 19,19 €</div></div>
+      <div class="card"><div class="ph ci"></div><div class="ct">Veste zippée Sherpa</div><div class="cp">dès 29,87 €</div></div>
+      <div class="card"><div class="ph ci"></div><div class="ct">Sweat capuche Bio femme</div><div class="cp">dès 10,21 €</div></div>
+      <div class="card"><div class="ph ci"></div><div class="ct">Sweat capuche contrasté</div><div class="cp">dès 14,61 €</div></div>
+    </div>
+
+    <div class="reviews">
+      <div class="review"><div class="stars">★★★★★</div> « Bonne réactivité, bons conseils. »</div>
+      <div class="review"><div class="stars">★★★★★</div> « Écoute et répond à notre besoin. »</div>
+      <div class="review"><div class="stars">★★★★★</div> « Une équipe toujours disponible. »</div>
+      <div class="review"><div class="stars">★★★★★</div> « Réactif, réponse adaptée. »</div>
+    </div>
+
+    <div class="foot"><span class="tag">footer inchangé</span>
+      <div>NOTRE OFFRE</div><div>ENTREPRISE</div><div>CONTACT</div><div>SUIVEZ-NOUS</div></div>
+  </div>
+
+  <!-- ============ DESKTOP — NIVEAU A — EN COURS ============ -->
+  <div class="frame-label">Desktop · niveau A · <b style="color:var(--accent);margin-left:4px">après saisie — prix débloqués, zone en cours</b></div>
+
+  <div class="browser">
+    <div class="config" style="padding-top:20px;">
+
+      <!-- étape 1 remplie -->
+      <div class="step" style="border-top:none;">
+        <div class="step-h"><span class="step-n">1</span><h3>Combien d'articles ?</h3>
+          <span class="hint">modifiable à tout moment</span></div>
+        <div class="colorpick">
+          <span class="cchip on"><span class="sq"></span> Blanc <span class="x">✕</span></span>
+          <span class="cchip on"><span class="sq" style="background:#3a4a6b"></span> Marine <span class="x">✕</span></span>
+          <span class="addc">+ ajouter une couleur</span>
+        </div>
+        <div class="sizegrid">
+          <div class="sg-row">
+            <div class="cthumb"></div><div class="cname">Blanc</div>
+            <div class="sizes">
+              <div class="size"><div class="lbl">S</div><input value="0"><small>st. 791</small></div>
+              <div class="size"><div class="lbl">M</div><input class="filled" value="12"><small>st. 2265</small></div>
+              <div class="size"><div class="lbl">L</div><input class="filled" value="8"><small>st. 1993</small></div>
+              <div class="size"><div class="lbl">XL</div><input value="0"><small>st. 759</small></div>
+            </div>
+          </div>
+          <div class="sg-row">
+            <div class="cthumb"></div><div class="cname">Marine</div>
+            <div class="sizes">
+              <div class="size"><div class="lbl">S</div><input value="0"><small>st. 640</small></div>
+              <div class="size"><div class="lbl">M</div><input class="filled" value="20"><small>st. 1880</small></div>
+              <div class="size"><div class="lbl">L</div><input class="filled" value="10"><small>st. 1502</small></div>
+              <div class="size"><div class="lbl">XL</div><input value="0"><small>st. 610</small></div>
+            </div>
+          </div>
+        </div>
+        <div class="sg-tot" style="border:1px solid var(--line);border-top:none;border-radius:0 0 8px 8px;">
+          <span>Total projet : <b>50</b> pièces</span>
+          <span class="ok">✓ minimum atteint</span>
+          <span style="color:var(--ink2)"><span class="marker">15</span> le dégressif se calcule sur le total, toutes couleurs confondues</span>
+        </div>
+      </div>
+
+      <!-- étape 2 active -->
+      <div class="step">
+        <div class="step-h"><span class="step-n">2</span><h3>Quelle personnalisation ?</h3>
+          <span class="hint"><span class="marker">16</span> prix calculés pour 50 pièces — comparez librement</span></div>
+        <div class="tcards">
+          <div class="tcard sel"><div class="timg">rendu broderie</div><div class="tb">
+            <div class="tn">Broderie</div><div class="tp">3,36 <small>€/pièce</small></div>
+            <div class="tf">+ 59,70 € frais technique</div>
+            <div class="tproj"><div class="lab">votre projet</div><div class="val">931,70 €</div>
+              <span class="tdelta cur">votre choix</span></div>
+            <div class="tmin">min. 10 pièces</div><div class="tdel">délai 9 j</div></div></div>
+
+          <div class="tcard"><div class="timg">rendu sérigraphie</div><div class="tb">
+            <div class="tn">Sérigraphie</div><div class="tp">1,81 <small>€/pièce</small></div>
+            <div class="tf">+ 37,31 € frais technique</div>
+            <div class="tproj"><div class="lab">votre projet</div><div class="val">831,81 €</div>
+              <span class="tdelta save"><span class="marker" style="box-shadow:0 0 0 1.5px #fff">17</span> −&nbsp;99,89 €</span></div>
+            <div class="tmin">min. 10 pièces</div><div class="tdel">délai 6 j</div></div></div>
+
+          <div class="tcard cheap"><div class="timg">rendu DTF</div><div class="tb">
+            <div class="tn">Impression DTF</div><div class="tp">0,99 <small>€/pièce</small></div>
+            <div class="tf">+ 52,24 € frais technique</div>
+            <div class="tproj"><div class="lab">votre projet</div><div class="val">805,74 €</div>
+              <span class="tdelta save">−&nbsp;125,96 €</span></div>
+            <div class="tmin">min. 10 pièces</div><div class="tdel">délai 9 j</div></div></div>
+
+          <div class="tcard"><div class="timg">rendu flex</div><div class="tb">
+            <div class="tn">Flex réfléchissant</div><div class="tp">6,33 <small>€/pièce</small></div>
+            <div class="tf">+ 44,78 € frais technique</div>
+            <div class="tproj"><div class="lab">votre projet</div><div class="val">1 065,28 €</div>
+              <span class="tdelta more">+&nbsp;133,58 €</span></div>
+            <div class="tmin">min. 10 pièces</div><div class="tdel">délai 9 j</div></div></div>
+
+          <div class="tcard off"><div class="timg">rendu transfert</div><div class="tb">
+            <div class="tn">Transfert sérigraphique</div><div class="tp">3,43 <small>€/pièce</small></div>
+            <div class="tf">+ 41,02 € frais technique</div>
+            <div class="tproj"><div class="lab">votre projet</div><div class="val" style="color:var(--mute)">—</div></div>
+            <div class="tmin"><span class="marker">18</span> à partir de 75 pièces</div><div class="tdel">délai 11 j</div></div></div>
+        </div>
+        <div style="font-size:11px;color:var(--ink2);margin-top:10px;">
+          <span class="marker">17b</span> Écarts calculés sur <b>votre projet complet</b> — article, quantité et emplacement compris. Changer de technique met tout à jour.
+        </div>
+      </div>
+
+      <!-- étape 3 active -->
+      <div class="step">
+        <div class="step-h"><span class="step-n">3</span><h3>Où placer votre logo ?</h3>
+          <span class="hint"><span class="marker">18</span> plusieurs emplacements possibles · tous en <b>Broderie</b> (technique unique du projet)</span></div>
+
+        <div style="border:1px solid var(--line);border-radius:7px;padding:9px 13px;margin-bottom:12px;background:var(--fill2);font-size:11.5px;">
+          <span class="marker">19</span> Technique du projet : <b>Broderie</b> — elle s'applique à tous les emplacements.
+          <span style="color:var(--accent);text-decoration:underline;margin-left:6px;">↑ changer de technique (étape 2)</span>
+        </div>
+
+        <div class="zones">
+          <div class="zone sel"><div class="ph zi"></div><div class="zn">Poitrine</div><div class="zd">280 × 200 mm</div><div class="zp">+ 0,99 €</div></div>
+          <div class="zone"><div class="ph zi"></div><div class="zn">Cœur</div><div class="zd">100 × 100 mm</div><div class="zp">+ 0,99 €</div></div>
+          <div class="zone"><div class="ph zi"></div><div class="zn">Dos</div><div class="zd">280 × 400 mm</div><div class="zp">+ 1,81 €</div></div>
+          <div class="zone"><div class="ph zi"></div><div class="zn">Manche droite</div><div class="zd">100 × 70 mm</div><div class="zp">+ 0,99 €</div></div>
+          <div class="zone off"><div class="ph zi"></div><div class="zn">Capuche</div><div class="zd">280 × 300 mm</div>
+            <div class="zd" style="color:var(--note)"><span class="marker">20</span> non compatible broderie</div></div>
+        </div>
+
+        <div class="zonecfg">
+          <div class="zh">Poitrine — 280 × 200 mm
+            <span class="pill" style="cursor:default;">Broderie</span>
+            <span style="font-size:11px;color:var(--ink2);font-weight:400"><span class="marker">21</span> technique du projet — non modifiable par zone dans cette version</span></div>
+          <div class="upl">
+            <button class="btn p">📎 Choisir mon logo</button>
+            <button class="btn">Je l'enverrai plus tard</button>
+            <span style="font-size:11px;color:var(--ink2)">formats acceptés : AI, EPS, PDF, PNG haute résolution</span>
+          </div>
+          <div style="margin-top:11px;border-top:1px solid var(--line);padding-top:10px;font-size:11.5px;color:var(--ink);display:flex;gap:9px;align-items:flex-start;">
+            <span style="color:var(--accent);font-size:15px;line-height:1;">✔</span>
+            <span><span class="marker">22</span> <b>Nos graphistes vérifient chaque fichier et vous envoient un BAT avant production.</b> Si votre logo demande une adaptation, on vous propose la meilleure solution — rien n'est lancé sans votre accord.
+            <span style="color:var(--accent);text-decoration:underline;">&nbsp;Un doute ? Faites vérifier votre logo</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- barre dépliée -->
+    <div class="bardet">
+      <div style="font-size:12px;font-weight:800;margin-bottom:8px;"><span class="marker">23</span> Détail du projet</div>
+      <table class="dtable">
+        <tr><td class="lbl">Sweat Condor — Blanc (20) + Marine (30)</td><td class="num">14,08 € × 50</td><td class="num">704,00 €</td></tr>
+        <tr><td class="lbl">Poitrine — Broderie</td><td class="num">3,36 € × 50</td><td class="num">168,00 €</td></tr>
+        <tr><td class="lbl" style="padding-left:18px;">↳ frais technique broderie <span style="color:var(--mute)">(fixe, non multiplié par la quantité)</span></td><td class="num"></td><td class="num">59,70 €</td></tr>
+        <tr class="tot"><td>TOTAL HT</td><td class="num" style="font-size:11px;color:var(--ink2)">soit 18,63 €/pièce</td><td class="num">931,70 €</td></tr>
+      </table>
+    </div>
+
+    <div class="bar">
+      <div class="bth"></div>
+      <div class="bsum"><b>50 pièces</b> · Blanc + Marine<br>Broderie · poitrine · livraison ~9 j</div>
+      <div class="bprice"><div class="u">18,63 €/pièce · <span class="bdet">masquer le détail ▾</span></div><div class="t">931,70 € HT</div></div>
+      <div>
+        <button class="cta">Ajouter au panier</button>
+        <div class="bat"><span class="marker">24</span> aucune production sans votre BAT</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MOBILE ============ -->
+  <div class="frame-label">Mobile 390×844 · niveau A · même structure, même barre — densité adaptée</div>
+
+  <div style="display:grid;grid-template-columns:390px 390px;gap:30px;">
+
+    <!-- mobile état zéro -->
+    <div>
+      <div style="font-size:11px;color:var(--ink2);margin-bottom:8px;font-weight:700;">ÉTAT ZÉRO</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="m-scroll">
+          <div class="site-head" style="padding:9px 12px"><span>☰</span><span class="logo" style="margin:0 auto">DYNAMIZ</span><span>🔍 🛍</span></div>
+          <div class="m-pad" style="padding-top:10px">
+            <div class="ph hero" style="min-height:190px"><div class="badges"><span class="badge">Éco-conçu</span><span class="badge promo">−15 %</span></div><span>galerie</span></div>
+            <div class="brand" style="margin-top:12px">SOL'S</div>
+            <div class="h1" style="margin:2px 0 8px;font-size:16px;">Sweat-Shirt Condor à personnaliser</div>
+            <div class="vlabel">Aperçu couleur : <b>Blanc</b></div>
+            <div class="vrow"><i></i><i></i><i></i><i></i><i></i><span class="more">+21</span></div>
+            <div class="anchor" style="margin-top:12px">
+              <div class="big">dès 12,47 € <small>HT — sans marquage</small></div>
+              <div class="qmin">Quantité minimum : 10 pièces</div>
+            </div>
+            <div class="reassure" style="margin-top:10px;flex-wrap:nowrap;overflow-x:auto;">
+              <div class="r" style="min-width:92px"><b>★ 4,6</b> Trustpilot</div>
+              <div class="r" style="min-width:92px"><b>2006</b> 20 ans</div>
+              <div class="r key" style="min-width:92px"><b>BAT</b> gratuit</div>
+            </div>
+            <div class="help" style="margin-top:10px;gap:12px"><div><b>📞</b> Appeler</div><div><b>💬</b> Chat</div><div><b>📄</b> <span class="dv">Devis</span></div></div>
+          </div>
+
+          <div class="config" style="padding:16px 14px 0">
+            <div class="config-intro"><h2 style="font-size:15px">Personnalisez votre projet</h2></div>
+            <div class="step" style="padding:14px 0">
+              <div class="step-h"><span class="step-n">1</span><h3 style="font-size:14px">Combien d'articles ?</h3></div>
+              <div class="colorpick"><span class="cchip on"><span class="sq"></span> Blanc</span><span class="addc">+ couleur</span></div>
+              <div class="sizegrid"><div class="sg-row" style="flex-wrap:wrap;gap:8px">
+                <div class="cthumb"></div><div class="cname">Blanc</div>
+                <div class="sizes" style="width:100%">
+                  <div class="size"><div class="lbl">S</div><input value="0"><small>791</small></div>
+                  <div class="size"><div class="lbl">M</div><input value="0"><small>2265</small></div>
+                  <div class="size"><div class="lbl">L</div><input value="0"><small>1993</small></div>
+                  <div class="size"><div class="lbl">XL</div><input value="0"><small>759</small></div>
+                </div></div></div>
+              <div class="sg-tot" style="border:1px solid var(--line);border-top:none;flex-direction:column;align-items:flex-start;gap:4px;">
+                <span>Total : <b>0</b> pièce</span>
+                <span style="color:var(--note);font-weight:700;font-size:11px">↑ saisissez vos quantités pour voir les prix</span>
+              </div>
+            </div>
+            <div class="step" style="padding:14px 0">
+              <div class="step-h"><span class="step-n">2</span><h3 style="font-size:14px">Quelle personnalisation ?</h3></div>
+              <div class="tcards" style="grid-template-columns:repeat(2,1fr)">
+                <div class="tcard waiting"><div class="timg" style="height:70px">broderie</div><div class="tb"><div class="tn">Broderie</div><div class="tp">— <small>€/pc</small></div><div class="tmin">min. 10</div></div></div>
+                <div class="tcard waiting"><div class="timg" style="height:70px">sérigraphie</div><div class="tb"><div class="tn">Sérigraphie</div><div class="tp">— <small>€/pc</small></div><div class="tmin">min. 10</div></div></div>
+                <div class="tcard waiting"><div class="timg" style="height:70px">DTF</div><div class="tb"><div class="tn">Impression DTF</div><div class="tp">— <small>€/pc</small></div><div class="tmin">min. 10</div></div></div>
+                <div class="tcard waiting"><div class="timg" style="height:70px">flex</div><div class="tb"><div class="tn">Flex</div><div class="tp">— <small>€/pc</small></div><div class="tmin">min. 10</div></div></div>
+              </div>
+            </div>
+            <div class="step locked" style="margin:0 -14px;padding:14px">
+              <div class="step-h"><span class="step-n">3</span><h3 style="font-size:14px">Où placer votre logo ?</h3></div>
+              <span class="lock-msg">Après le choix de la personnalisation</span>
+            </div>
+          </div>
+
+          <div class="m-bar" style="background:var(--fill2);border-top:1px solid var(--line);box-shadow:none;">
+            <div class="l1"><div class="bth"></div><div class="s"><b>Votre projet</b><br>aucune quantité</div>
+              <div class="p"><div class="u">neutre</div><div class="t" style="font-size:14px;color:var(--ink2)">dès 12,47 €</div></div></div>
+            <button class="cta off">Ajouter au panier</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- mobile en cours -->
+    <div>
+      <div style="font-size:11px;color:var(--ink2);margin-bottom:8px;font-weight:700;">EN COURS — barre dépliée</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="m-scroll">
+          <div class="config" style="padding:14px">
+            <div class="step" style="border-top:none;padding:0 0 14px">
+              <div class="step-h"><span class="step-n">2</span><h3 style="font-size:14px">Quelle personnalisation ?</h3></div>
+              <div class="tcards" style="grid-template-columns:repeat(2,1fr)">
+                <div class="tcard sel"><div class="timg" style="height:70px">broderie</div><div class="tb"><div class="tn">Broderie</div><div class="tp">3,36 <small>€/pc</small></div><div class="tf">+ 59,70 €</div>
+                  <div class="tproj"><div class="lab">projet</div><div class="val">931,70 €</div><span class="tdelta cur">votre choix</span></div></div></div>
+                <div class="tcard cheap"><div class="timg" style="height:70px">DTF</div><div class="tb"><div class="tn">DTF</div><div class="tp">0,99 <small>€/pc</small></div><div class="tf">+ 52,24 €</div>
+                  <div class="tproj"><div class="lab">projet</div><div class="val">805,74 €</div><span class="tdelta save">−&nbsp;125,96 €</span></div></div></div>
+                <div class="tcard"><div class="timg" style="height:70px">sérigraphie</div><div class="tb"><div class="tn">Sérigraphie</div><div class="tp">1,81 <small>€/pc</small></div><div class="tf">+ 37,31 €</div>
+                  <div class="tproj"><div class="lab">projet</div><div class="val">831,81 €</div><span class="tdelta save">−&nbsp;99,89 €</span></div></div></div>
+                <div class="tcard off"><div class="timg" style="height:70px">transfert</div><div class="tb"><div class="tn">Transfert</div><div class="tp">3,43 <small>€/pc</small></div>
+                  <div class="tproj"><div class="lab">projet</div><div class="val" style="color:var(--mute)">—</div></div>
+                  <div class="tmin">dès 75 pc</div></div></div>
+              </div>
+            </div>
+            <div class="step" style="padding:14px 0 0">
+              <div class="step-h"><span class="step-n">3</span><h3 style="font-size:14px">Où placer votre logo ?</h3></div>
+              <div style="border:1px solid var(--line);border-radius:6px;padding:7px 10px;margin-bottom:10px;background:var(--fill2);font-size:11px;">
+                Technique : <b>Broderie</b> — pour tous les emplacements.</div>
+              <div class="zones" style="grid-template-columns:repeat(2,1fr)">
+                <div class="zone sel"><div class="ph zi" style="height:64px"></div><div class="zn">Poitrine</div><div class="zp">+ 0,99 €</div></div>
+                <div class="zone"><div class="ph zi" style="height:64px"></div><div class="zn">Cœur</div><div class="zp">+ 0,99 €</div></div>
+                <div class="zone"><div class="ph zi" style="height:64px"></div><div class="zn">Dos</div><div class="zp">+ 1,81 €</div></div>
+                <div class="zone off"><div class="ph zi" style="height:64px"></div><div class="zn">Capuche</div><div class="zd" style="color:var(--note)">non compat.</div></div>
+              </div>
+              <div class="zonecfg" style="padding:11px">
+                <div class="zh" style="font-size:12px">Poitrine <span class="pill" style="cursor:default">Broderie</span></div>
+                <div class="upl"><button class="btn p" style="flex:1">📎 Choisir mon logo</button><button class="btn">Plus tard</button></div>
+                <div style="margin-top:9px;font-size:10.5px;color:var(--ink);display:flex;gap:7px;">
+                  <span style="color:var(--accent)">✔</span><span>Vérification par nos graphistes + BAT avant production.</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bardet" style="padding:12px 14px;">
+            <div style="font-size:11.5px;font-weight:800;margin-bottom:6px;">Détail du projet</div>
+            <table class="dtable" style="font-size:11px">
+              <tr><td class="lbl">Sweat — Blanc + Marine</td><td class="num">14,08 × 50</td><td class="num">704,00 €</td></tr>
+              <tr><td class="lbl">Poitrine — Broderie</td><td class="num">3,36 × 50</td><td class="num">168,00 €</td></tr>
+              <tr><td class="lbl" style="padding-left:12px">↳ frais technique <span style="color:var(--mute)">(fixe)</span></td><td></td><td class="num">59,70 €</td></tr>
+              <tr class="tot"><td>TOTAL HT</td><td></td><td class="num">931,70 €</td></tr>
+            </table>
+          </div>
+
+          <div class="m-bar">
+            <div class="l1"><div class="bth"></div>
+              <div class="s"><b>50 pièces</b> · 2 coul.<br>Broderie · poitrine · ~9 j</div>
+              <div class="p"><div class="u">18,63 €/pc · <span class="bdet">détail ▾</span></div><div class="t">931,70 €</div></div></div>
+            <button class="cta">Ajouter au panier</button>
+            <div class="bat">aucune production sans votre BAT</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ VARIANTES C ET D ============ -->
+  <div class="frame-label"><span class="marker" style="margin-right:2px">24</span> Variantes du même gabarit — niveaux C et D</div>
+
+  <div class="vgrid">
+    <div class="vbox">
+      <div class="vh">NIVEAU C — prix marquage inconnu, techniques inconnues <small>≈ 30 % du catalogue · le neutre garde son prix et reste commandable</small></div>
+      <div class="vc">
+        <div class="anchor" style="margin-bottom:14px;">
+          <div class="big">dès 0,88 € <small>HT — sans marquage</small></div>
+          <div class="qmin">Quantité minimum : 100 pièces</div>
+          <div class="devis-line"><span class="marker">25</span> <b>Prix avec marquage :</b> chiffré par notre équipe — réponse sous 24 h</div>
+        </div>
+
+        <div class="step" style="border-top:none;padding:0 0 14px">
+          <div class="step-h"><span class="step-n">1</span><h3 style="font-size:14px">Combien d'articles ?</h3></div>
+          <div class="sizegrid"><div class="sg-row"><div class="cthumb"></div><div class="cname">Translucide</div>
+            <div class="sizes"><div class="size"><div class="lbl">quantité</div><input class="filled" value="150"></div></div></div></div>
+        </div>
+
+        <div class="step" style="padding:14px 0">
+          <div class="step-h"><span class="step-n">2</span><h3 style="font-size:14px">Votre logo</h3></div>
+          <div class="upl"><button class="btn p">📎 Choisir mon logo</button><button class="btn">Je l'enverrai plus tard</button></div>
+          <div style="font-size:11px;color:var(--ink2);margin-top:9px;">
+            <span class="marker">26</span> Pas de choix de technique demandé : <b>nous déterminons le marquage adapté</b> à cet article et à votre logo.
+          </div>
+        </div>
+
+        <div class="step" style="padding:14px 0">
+          <div class="step-h"><span class="step-n">3</span><h3 style="font-size:14px">Où et pour quand ?</h3></div>
+          <div style="border:1px solid var(--line);border-radius:6px;padding:10px;font-size:11.5px;color:var(--mute);margin-bottom:9px;">
+            Emplacement souhaité — ex. « sur le corps du gobelet », « logo centré »…</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <span class="btn">Délai standard</span><span class="btn">J'ai une échéance</span><span class="btn">C'est urgent</span>
+          </div>
+        </div>
+
+        <div class="bar" style="position:static;margin:10px -14px -14px;padding:11px 14px;">
+          <div class="bth"></div>
+          <div class="bsum"><b>150 pièces</b><br>logo transmis · délai standard</div>
+          <div class="bprice"><div class="u">neutre</div><div class="t" style="font-size:16px">132,00 € HT</div></div>
+          <button class="cta">Envoyer ma demande</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="vbox">
+      <div class="vh">NIVEAU D — aucun prix disponible <small>&lt; 5 % · secours base de données <b>et</b> articles de petits fabricants non automatisés · <b>même parcours que C</b>, sans ancrage prix</small></div>
+      <div class="vc">
+        <div class="ph hero" style="min-height:120px;margin-bottom:14px;"><span>galerie · description · réassurance conservées</span></div>
+
+        <div style="border:1px solid var(--line);border-radius:8px;padding:11px 13px;margin-bottom:14px;background:var(--fill2);">
+          <div style="font-size:12.5px;font-weight:800;"><span class="marker">27</span> Article proposé sur devis</div>
+          <div style="font-size:11px;color:var(--ink2);margin-top:3px;">Tarif et personnalisation établis par notre équipe selon votre projet — réponse sous 24 h.</div>
+        </div>
+
+        <div class="step" style="border-top:none;padding:0 0 12px">
+          <div class="step-h"><span class="step-n">1</span><h3 style="font-size:14px">Combien d'articles ?</h3></div>
+          <div class="sizegrid"><div class="sg-row"><div class="cthumb"></div><div class="cname">Quantité</div>
+            <div class="sizes"><div class="size"><div class="lbl">pièces</div><input class="filled" value="250"></div></div></div></div>
+        </div>
+        <div class="step" style="padding:12px 0">
+          <div class="step-h"><span class="step-n">2</span><h3 style="font-size:14px">Votre logo</h3></div>
+          <div class="upl"><button class="btn p">📎 Choisir mon logo</button><button class="btn">Je l'enverrai plus tard</button></div>
+          <div style="font-size:11px;color:var(--ink2);margin-top:9px;">Nous déterminons le marquage adapté à cet article et à votre logo.</div>
+        </div>
+        <div class="step" style="padding:12px 0">
+          <div class="step-h"><span class="step-n">3</span><h3 style="font-size:14px">Où et pour quand ?</h3></div>
+          <div style="border:1px solid var(--line);border-radius:6px;padding:10px;font-size:11.5px;color:var(--mute);margin-bottom:9px;">Emplacement souhaité — en langage courant…</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;"><span class="btn">Délai standard</span><span class="btn">J'ai une échéance</span><span class="btn">C'est urgent</span></div>
+        </div>
+
+        <div class="bar" style="position:static;margin:8px 0 0;padding:11px 14px;border:1px solid var(--line);border-radius:8px;">
+          <div class="bth"></div>
+          <div class="bsum"><b>250 pièces</b><br>logo transmis · délai standard</div>
+          <div class="bprice"><div class="u" style="color:var(--note)"><span class="marker">28</span> sans prix</div></div>
+          <button class="cta">Envoyer ma demande</button>
+        </div>
+
+        <div class="section-t" style="margin:18px 0 8px;font-size:12.5px;">Articles similaires disponibles en ligne</div>
+        <div class="cards5" style="grid-template-columns:repeat(3,1fr);padding:0">
+          <div class="card"><div class="ph ci" style="height:66px"></div><div class="cp">dès 2,96 €</div></div>
+          <div class="card"><div class="ph ci" style="height:66px"></div><div class="cp">dès 7,60 €</div></div>
+          <div class="card"><div class="ph ci" style="height:66px"></div><div class="cp">dès 9,07 €</div></div>
+        </div>
+        <div style="font-size:10.5px;color:var(--mute);margin-top:8px;"><span class="marker">29</span> Rebond indispensable : un visiteur SEO ne doit pas repartir les mains vides.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ COUCHE IA ACTIVABLE ============ -->
+  <div class="frame-label"><span class="marker" style="margin-right:2px">30</span> Couche IA de faisabilité — <b style="color:var(--note);margin-left:4px">activable ultérieurement · désactivée par défaut</b></div>
+  <div style="border:2px dashed var(--note);border-radius:8px;padding:18px;background:#fff;">
+    <div style="font-size:12px;color:var(--ink2);margin-bottom:14px;">
+      <span class="marker">31</span> Le parcours ci-dessus est <b>complet et rassurant sans elle</b> (repères statiques + promesse BAT + aide humaine). L'IA vient <b>enrichir</b> l'étape logo une fois cadrée sur les règles Dynamiz et sa fiabilité validée — jamais un prérequis de lancement. Voici à quoi ressemblera l'alerte quand tu l'activeras :
+    </div>
+
+    <div class="zonecfg" style="max-width:620px;">
+      <div class="zh">Poitrine — 280 × 200 mm <span class="pill" style="cursor:default;">Broderie</span></div>
+      <div class="card-in" style="background:#fff;border:1px solid var(--line);border-radius:7px;padding:12px;">
+        <div style="display:flex;align-items:center;gap:11px;">
+          <div style="width:44px;height:44px;border:1px solid var(--line);border-radius:6px;flex-shrink:0;background:repeating-linear-gradient(45deg,var(--fill2),var(--fill2) 6px,var(--fill) 6px,var(--fill) 12px);"></div>
+          <div style="flex:1;"><div style="font-size:12px;font-weight:700;">logo-client.png</div><div style="font-size:10.5px;color:var(--ink2);">photo · dégradés</div></div>
+          <button class="btn"><span class="marker">32</span> Choisir un autre logo</button>
+        </div>
+
+        <div style="margin-top:12px;border:1px solid var(--note);border-radius:7px;padding:12px;">
+          <!-- niveau 1 : constat local -->
+          <div style="font-size:12.5px;font-weight:700;color:var(--note);"><span class="marker">33</span> Ce logo n'est pas idéal en broderie sur cet emplacement</div>
+          <div style="font-size:11.5px;color:var(--ink);margin:5px 0 10px;">Les dégradés se brodent mal. Deux façons simples de régler ça, sans toucher au reste :</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn p">📎 Choisir un autre logo</button>
+            <button class="btn g">Faire vérifier par notre équipe</button>
+          </div>
+
+          <!-- niveau 2 : option globale explicitement cadrée -->
+          <div style="margin-top:12px;padding-top:11px;border-top:1px dashed var(--line);">
+            <div style="font-size:11.5px;color:var(--ink);"><span class="marker">34</span> Ou changer de technique — <b>pour l'ensemble de votre marquage</b> :</div>
+            <button class="btn" style="margin-top:8px;">Tout passer en DTF <b>(− 125,96 €)</b> · <span style="color:var(--ink2);font-weight:400">s'applique à vos 3 emplacements</span></button>
+          </div>
+
+          <div style="font-size:10.5px;color:var(--mute);margin-top:10px;">Non bloquant. Vous pouvez continuer : nos graphistes contrôlent chaque fichier et vous envoient un BAT avant production.</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="font-size:11.5px;color:var(--ink2);margin-top:14px;max-width:720px;">
+      <span class="marker">35</span> <b>L'alerte sépare deux niveaux</b> parce que le problème est <b>local</b> (ce logo, cette zone) mais la seule manette est <b>globale</b> (une technique unique). Niveau 1 = réponses locales qui ne cassent rien (autre logo, vérification). Niveau 2 = la bascule technique, <b>explicitement annoncée comme globale</b> (« l'ensemble », « vos 3 emplacements ») pour qu'elle ne soit jamais un piège. Le client règle sa zone sans perdre les autres dans la majorité des cas.
+    </div>
+  </div>
+
+  
+  <!-- ============ NOTES ============ -->
+  <div class="notes">
+    <h2>Notes de conception</h2>
+    <p class="hint">Chaque marqueur renvoie à une décision validée. Rationale en une ligne.</p>
+
+    <div class="note-item"><span class="marker">1</span><span><b>Galerie photo réelle</b> — moteur de projection à la place d'un configurateur visuel. Bascule à la couleur sélectionnée. Aucun faux composite.</span></div>
+    <div class="note-item"><span class="marker">2</span><span><b>Couleur = aperçu, pas choix.</b> Pilote la photo, sert de point de départ ; « +N » enroule la rangée. Le <b>multi-couleurs se décide à l'étape 1</b> du configurateur, où la couleur en cours arrive pré-cochée.</span></div>
+    <div class="note-item"><span class="marker">3</span><span><b>Ancrage prix neutre conservé.</b> « dès X € HT — sans marquage » + quantité minimum. Le marquage s'ajoute, il ne remplace pas : c'est ce qui désamorce le prix-choc.</span></div>
+    <div class="note-item"><span class="marker">4</span><span><b>« Commander sans marquage »</b> — lien secondaire, dès le haut de fiche, si l'article l'autorise. Absent si marquage obligatoire.</span></div>
+    <div class="note-item"><span class="marker">5</span><span><b>Réassurance near-engagement</b> (remontée du footer) : Trustpilot, 2006, France/RSE, <b>Simulation &amp; BAT gratuits</b>. Indispensable sur une page où 72 % des visiteurs atterrissent directement.</span></div>
+    <div class="note-item"><span class="marker">6</span><span><b>Échappatoires permanentes</b> — appel / chat / demander un devis. Toujours en vue, jamais en concurrence avec le parcours principal.</span></div>
+    <div class="note-item"><span class="marker">7</span><span><b>Pas de CTA-porte.</b> Le configurateur est <b>déjà là</b> à l'état zéro, en pleine largeur. La porte actuelle perd 94 % du flux : on la supprime au lieu de la redécorer. Le déclencheur est le champ quantité.</span></div>
+    <div class="note-item"><span class="marker">8</span><span><b>Le minimum est annoncé avant la saisie</b>, pas après. Idem stock par taille.</span></div>
+    <div class="note-item"><span class="marker">9</span><span><b>Multi-couleurs</b> — ajouter/retirer une couleur ne réinitialise jamais les tailles déjà saisies sur les autres.</span></div>
+    <div class="note-item"><span class="marker">10</span><span><b>Cartes de technique visibles dès l'état zéro</b>, visuels réels, prix à « — ». Le client voit ce qu'on sait faire avant de rien donner ; la curiosité déclenche la saisie. C'est l'incitation, à la place du bouton.</span></div>
+    <div class="note-item"><span class="marker">10b</span><span><b>Repère de compatibilité (levier « sans IA »).</b> Puisque les clients lisent peu, l'orientation est <b>graphique</b> : une icône par carte (aplats/vectoriel vs photo/dégradés), pas un pavé de texte. Statique, fiable, sans analyse. Le client s'auto-oriente avant de déposer son logo.</span></div>
+    <div class="note-item"><span class="marker">11</span><span><b>Un seul verrou dur : la quantité.</b> L'étape 3 affiche sa raison de verrouillage plutôt que de disparaître.</span></div>
+    <div class="note-item"><span class="marker">12</span><span><b>Barre de suivi horizontale, sticky</b> — <b>même composant desktop et mobile</b>, densité différente. Remplace la colonne latérale.</span></div>
+    <div class="note-item"><span class="marker">13</span><span><b>Onglets desktop / accordéon mobile</b>, description active par défaut. Placés <b>sous</b> le configurateur.</span></div>
+    <div class="note-item"><span class="marker">14</span><span><b>Ouverture catalogue</b> + avis — conservés en bas.</span></div>
+    <div class="note-item"><span class="marker">15</span><span><b>Minimum et dégressif sur le total</b>, toutes couleurs confondues.</span></div>
+    <div class="note-item"><span class="marker">16</span><span><b>Comparaison libre des techniques</b> à quantité réelle. Retour arrière encouragé : scénario broderie → sérigraphie qui fait économiser et convertit. <b>Ici la comparaison reste toujours globale</b> (une seule technique par projet) — le comparateur n'a qu'un état, plus simple que la version à mix.</span></div>
+    <div class="note-item"><span class="marker">17</span><span><b>L'économie affichée sur le projet complet — cœur du dispositif.</b> Chaque carte porte le <b>total du projet</b> et l'<b>écart</b> au choix courant. Un écart de 125,96 € se décide sans calcul mental — c'est ce qui convertit au lieu de laisser abandonner.</span></div>
+    <div class="note-item"><span class="marker">17b</span><span><b>Écarts calculés sur le projet réel</b> (article + quantité + emplacements). Recalcul à chaque changement.</span></div>
+    <div class="note-item"><span class="marker">18</span><span><b>Technique unique — la décision d'équipe.</b> La technique de l'étape 2 s'applique à <b>tous</b> les emplacements ; en changer rebascule tout le projet. Plus d'override par zone. Simplification majeure vs la version mix (comparateur mono-état, plus de garde-fou d'override, plus de comparateur de zone).</span></div>
+    <div class="note-item"><span class="marker">19</span><span><b>Rappel de la technique globale</b> en tête de l'étape 3, avec raccourci « changer de technique (étape 2) ». Le client comprend que le choix vaut pour tout.</span></div>
+    <div class="note-item"><span class="marker">20</span><span><b>Incompatibilité technique × zone</b> — grisée avec sa cause. Une zone non compatible avec la technique globale n'est pas sélectionnable.</span></div>
+    <div class="note-item"><span class="marker">21</span><span><b>Puce technique en lecture seule</b> sur la zone : rappelle la technique du projet, <b>non modifiable par zone</b> dans cette version.</span></div>
+    <div class="note-item"><span class="marker">22</span><span><b>Réassurance humaine — le vrai porteur de confiance sans IA.</b> Sous l'upload : « nos graphistes vérifient chaque fichier et vous envoient un BAT ; si le logo demande une adaptation, on propose la meilleure solution ». Dit exactement l'intention — <i>on est là pour que ça se passe bien</i> — sans rien promettre d'irréel. + aide « faire vérifier » à portée, sereine.</span></div>
+    <div class="note-item"><span class="marker">23</span><span><b>Détail dépliable</b> : neutre + une ligne par zone + frais technique isolés, marqués « fixe » (non multipliés par la quantité).</span></div>
+    <div class="note-item"><span class="marker">24</span><span><b>Promesse BAT attachée au bouton</b> — le filet qui autorise le paiement CB en amont.</span></div>
+    <div class="note-item"><span class="marker">25</span><span><b>Un seul gabarit, quatre niveaux de données</b> (A/B/C/D). Dégradation brique par brique.</span></div>
+    <div class="note-item"><span class="marker">26</span><span><b>Niveau C — l'ancrage neutre reste.</b> Seul le prix avec marquage est inconnu ; chiffrage sous 24 h.</span></div>
+    <div class="note-item"><span class="marker">27</span><span><b>Niveau C — on ne demande pas la technique.</b> Déterminer la technique est notre métier. « Envoyer ma demande » crée une <b>opportunité Odoo</b>, pas un devis chiffré.</span></div>
+    <div class="note-item"><span class="marker">28</span><span><b>Niveau D — même parcours que C, sans ancrage prix.</b> Assumé : sert aussi les pièces de petits fabricants non automatisés. Opportunité Odoo.</span></div>
+    <div class="note-item"><span class="marker">29</span><span><b>Rebond obligatoire au niveau D</b> — un visiteur SEO ne doit pas repartir les mains vides.</span></div>
+    <div class="note-item"><span class="marker">30</span><span><b>Couche IA — activable, désactivée par défaut.</b> Le parcours tient sans elle (repère statique + BAT + aide humaine). Tu ne l'actives qu'une fois cadrée sur tes règles et sa fiabilité testée — jamais un prérequis. Un avis automatique faux détruirait la confiance que tout le reste construit ; l'optionnalité te protège.</span></div>
+    <div class="note-item"><span class="marker">31</span><span><b>Sans IA, la confiance vient de l'humain</b>, pas d'un avis machine — c'est le levier 22 remonté au rang de pilier à l'état de base.</span></div>
+    <div class="note-item"><span class="marker">32</span><span><b>Remplacer le fichier</b> reste l'action de premier recours quand un logo pose souci — souvent le vectoriel au lieu du PNG règle tout.</span></div>
+    <div class="note-item"><span class="marker">33</span><span><b>Alerte niveau 1 — constat local, réponses locales.</b> « Ce logo n'est pas idéal en broderie ici » → autre logo, ou vérification équipe. <b>Ne touche aucune autre zone.</b></span></div>
+    <div class="note-item"><span class="marker">34</span><span><b>Alerte niveau 2 — bascule globale, cadrée honnêtement.</b> La technique étant unique, changer = tout changer. Le libellé le dit (« l'ensemble », « vos 3 emplacements ») pour que ce ne soit jamais un piège.</span></div>
+    <div class="note-item"><span class="marker">35</span><span><b>Pourquoi deux niveaux :</b> le problème est local, la seule manette est globale. Séparer protège les zones qui vont bien (majorité des cas) tout en gardant la bascule globale comme sortie assumée. Non bloquant : le client peut toujours continuer, le BAT reste le filet.</span></div>
+  </div>
+
+  <div class="arb">
+    <h3>À arbitrer / vérifier</h3>
+    <ul>
+      <li><b>Variante B vs variante A (mix).</b> Ce fichier est l'option « une technique par article » décidée en équipe. L'autre wireframe (v260723, conservé) garde le mix multi-technique. Trancher laquelle part en dev — B est nettement plus simple (pas de comparateur de zone, pas de garde-fou d'override, un frais technique par nature).</li>
+      <li><b>Longueur de page.</b> Configurateur + onglets + alternatives + avis : la page s'allonge nettement, surtout sur mobile. Vérifier que le rebond catalogue reste atteignable.</li>
+      <li><b>Poids relatif niveau A vs C.</b> Google Shopping exige un prix : les articles sans prix marquage sont probablement absents du flux payant, donc le niveau A concentre l'essentiel des 8 543 sessions Paid Shopping. À confirmer dans Merchant Center — si les articles C y sont poussés aussi, l'arbitrage d'effort change.</li>
+      <li><b>Minimum variable selon la technique.</b> Traité par l'affichage sur carte (18). Reste à vérifier en base que le minimum est bien exposé par technique et pas seulement par article.</li>
+      <li><b>Barre de suivi vs chat flottant.</b> Les deux occupent le bas d'écran sur mobile. Définir la cohabitation.</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>
